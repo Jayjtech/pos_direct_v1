@@ -21,7 +21,9 @@ use App\Http\Controllers\Guest\GuestHomeController;
 use App\Http\Controllers\Guest\ShopController as GuestShopController;
 use App\Models\Setting;
 
-Route::get('/', [GuestHomeController::class, 'home']);
+Route::get('/', function(){
+    return view('welcome');
+});
 
 Auth::routes();
 
