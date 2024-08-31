@@ -89,9 +89,10 @@
             $(document).on('click', '.delete-category a', function() {
                 var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
                 var category_id = $(this).attr("data-id");
+                var route = {{ route('admin.delete.product', category_id) }}
 
                 $('.delete-modal-footer').html(
-                    `<p>Still want to proceed?</p> <a href="/admin/delete-category/${category_id}" class="btn btn-primary">Yes</a>
+                    `<p>Still want to proceed?</p> <a href="${route}" class="btn btn-primary">Yes</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
                 );
                 $('.delete-modal').html(
@@ -148,3 +149,7 @@
         };
     </script>
 @endpush
+
+
+{{-- SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`ekreqipn_pos_v2`.`stocks`, CONSTRAINT `stocks_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) (SQL: delete from `products` where `id` = 2) --}}
+{{-- QLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`ekreqipn_pos_v2`.`products`, CONSTRAINT `products_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) (SQL: delete from `categories` where `id` = 2) --}}

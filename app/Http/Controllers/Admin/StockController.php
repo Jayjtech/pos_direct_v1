@@ -169,7 +169,18 @@ class StockController extends Controller
 
     public function approveAllStock(){
         try{
-            Stock::where('status', 0)->update(['status' => 1]);
+            $stocks = Stock::where('status', 0)->get();
+
+            foreach($stocks as $st){
+                $product = Product::where('id', $st->product_id)->first();
+                $st->qty_before_approval = $product->availability;
+                $product->availability += $st->qty_requested;
+                $st->qty_after_approval = ($product->availability);
+                $st->status = 1;
+                $product->save();
+                $st->save();
+            }
+
             notify()->success('All stock requests successfully approved!');
             return back();
         }catch(Exception $e){
