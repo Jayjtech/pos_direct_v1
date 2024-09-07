@@ -34,6 +34,7 @@ class ShopController extends Controller
                 $active_tab = $active_cart[0]->cart_report_id;
             }else{
                 $getFirstCartReport = CartReport::where('user_id', $user->id)->first();
+                // return $getFirstCartReport;
                 if($getFirstCartReport != null){
                     // Activate the first tab available
                     Cart::where('cart_report_id', $getFirstCartReport->id)->update(["status" => 0]);
@@ -132,6 +133,7 @@ class ShopController extends Controller
                     "address" => $tab->address,
                     "payment_method" => $payment_method,
                 ]),
+                "trx_id" => $tab->invoice_code,
                 "user_id" => $user->id,
                 "grand_total" => $tab->grand_total,
                 "status" => 1 //Completed

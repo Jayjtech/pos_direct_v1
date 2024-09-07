@@ -19,6 +19,7 @@
                         "X-CSRF-TOKEN": csrfToken
                     },
                     success: function(response) {
+                        console.log(response)
                         $("#grand-total").html(
                             `<span>Grand Total: {!! config('basic.c_s') !!}${new Intl.NumberFormat().format(parseFloat(response.grand_total))}</span>`
                         )
@@ -129,6 +130,51 @@
                 })
             })
 
+            $(document).on("click", ".check-discount input", function() {
+                var tag = $(this).attr("id");
+                if ($(this).prop("checked")) {
+                    $("#" + tag).val("checked");
+                } else {
+                    $("#" + tag).val("unchecked");
+                }
+
+                var status = $("#" + tag).val();
+                var id = tag.split("_")[1];
+
+                if (status == "unchecked") {
+                    var discount = 0;
+                } else {
+                    var discount = $("#label_" + id).text();
+                }
+
+                $.ajax({
+                    url: "{{ route('change.discount') }}",
+                    type: "post",
+                    data: {
+                        id: id,
+                        status: status,
+                        discount: discount
+                    },
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken
+                    },
+                    success: function(response) {
+                        $("#grand-total").html(
+                            `<span>Grand Total: {!! config('basic.c_s') !!}${new Intl.NumberFormat().format(parseFloat(response.grand_total))}</span>`
+                        )
+                        $('.cart-display').html(response.html);
+                        $('.variety').html(
+                            `<i class="mdi mdi-cart"></i> Variety: ${response.variety}</span>`
+                        )
+                        $("#response").html(
+                            `<span class="alert alert-${response.json.icon}">${response.json.message}</span>`
+                        )
+
+                    }
+                })
+            });
+
+
             // Add checkout method
             $(document).on('click', '.checkout-methods button', function() {
                 var checkout_method = $(this).attr('data-id');
@@ -214,6 +260,48 @@
                 })
             })
 
+            // Search invoice
+            $(document).on('blur', '.get-invoice', function() {
+                var invoice_code = $(this).val().toLowerCase();
+
+                if (invoice_code) {
+                    $.ajax({
+                        url: "{{ route('tab.request') }}",
+                        type: "post",
+                        data: {
+                            query: "view",
+                            invoice_code: invoice_code
+                        },
+                        headers: {
+                            "X-CSRF-TOKEN": csrfToken
+                        },
+                        success: function(response) {
+                            if (response.error) {
+                                $("#response").html(
+                                    `<span class="alert alert-${response.icon}">${response.message}</span>`
+                                )
+                            } else {
+                                $("#grand-total").html(
+                                    `<span>Grand Total: {!! config('basic.c_s') !!}${new Intl.NumberFormat().format(parseFloat(response.grand_total))}</span>`
+                                )
+                                $('.cart-display').html(response.html);
+                                $('.variety').html(
+                                    `<i class="mdi mdi-cart"></i> Variety: ${response.variety}</span>`
+                                )
+                                $("#response").html(
+                                    `<span class="alert alert-${response.json.icon}">${response.json.message}</span>`
+                                )
+                                $(".tab-display").html(response.tab_view);
+                                $(".payment-method-container").html(response.pm_method_view);
+                                // change the value of the tab to the active-id
+                                $(".new-tab").attr('active-tab', response.active_tab);
+                            }
+                        }
+                    })
+                }
+
+            })
+
             $(document).on('blur', '.cart-buyer-name', function() {
                 var buyer = $(this).val();
 
@@ -252,9 +340,6 @@
                 window.location.href = receiptUrl;
             }
         });
-
-
-
 
         function scrollToBottom() {
             var myDiv = document.querySelector('.cart-display');

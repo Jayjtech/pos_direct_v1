@@ -36,6 +36,36 @@
                     <input type="number" class="form-control" name="price" placeholder="Price" required />
                 </div>
             </div>
+            <div class="form-group row">
+                <div class="col-lg-6 mb-2">
+                    <label for="">Discount(%)</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-primary text-white">%</span>
+                        </div>
+                        <input type="number" class="form-control" name="discount_percent" required />
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-5">
+                    <label for="">Discount({!! config('basic.c_s') !!})</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
+                        </div>
+                        <input type="number" class="form-control" name="discount_amount" required />
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label for="discount_mode">Shop: Product discount mode</label>
+                        <select name="discount_mode" class="form-control" required>
+                            <option value="">Select discount mode</option>
+                            <option value="1">By Percentage</option>
+                            <option value="0">By Amount</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="form-group col-lg-6">

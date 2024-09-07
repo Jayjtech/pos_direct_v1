@@ -15,8 +15,8 @@
             </div>
             <div class="form-group">
                 <label for="">Quantity</label>
-                <input type="number" name="quantity" min="1" value="{{ $stock->qty_requested }}"
-                    class="form-control" placeholder="Quantity" required>
+                <input type="number" name="quantity" value="{{ $stock->qty_requested }}" class="form-control"
+                    placeholder="Quantity" required>
             </div>
         </div>
         <div class="modal-footer">

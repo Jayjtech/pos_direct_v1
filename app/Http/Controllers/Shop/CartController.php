@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Shop;
 use Exception;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\CartReport;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\CartReport;
 
 class CartController extends Controller
 {
@@ -18,6 +19,7 @@ class CartController extends Controller
     }
 
     public function addToCart(Request $request){
+        
         try{
             $user = auth()->user();
             $product = Product::findOrFail($request->product_id);
@@ -26,9 +28,11 @@ class CartController extends Controller
             // 1: Saved Cart
             $checkIfActiveCartExist = Cart::where('user_id', $user->id)
                                             ->where('status',0)->first();
+                
             if(!$checkIfActiveCartExist){
                 // If there is no active cart, create a new cart_report for the new TAB
-                $cart_report = CartReport::create(["user_id" => $user->id]);
+                $invoice_code = strtolower(Str::random(5)).substr(time(), 0, 3);
+                $cart_report = CartReport::create(["user_id" => $user->id, "invoice_code" => $invoice_code]);
                 $cart_report_id = $cart_report->id;
             }else{
                 // Else keep using the old cart_report_id
@@ -48,7 +52,9 @@ class CartController extends Controller
                     "qty" => 1,
                     "price" => $product->price,
                     "sub_total" => $product->price, //On creation, sub_total = price
-                    "discount" => 0
+                    "discount" => 0,
+                    "checkbox_status" => "unchecked",
+                    "pdt_discount" => $product->discount_mode == 0 ? $product->discount_amount: ($product->price*($product->discount_percent/100))
                 ]);
 
                 $response = [
@@ -84,6 +90,8 @@ class CartController extends Controller
                 ];
             }
         }
+
+        // return $response;
          // Fetch Tabs except current tab
         $tabs = CartReport::where('user_id', $user->id)
                             ->where('id', '!=', $cart_report_id)
@@ -172,7 +180,11 @@ class CartController extends Controller
                         'message' => '<strong>'.$cart_row->product->name . '</strong> quantity cannot be equal to <strong>0</strong>!'
                     ];
                 }else{
-                    $discount = ($request->qty*$cart_row->product->price)*($cart_row->discount/100);
+                    if(companyInfo()->discount_mode == 0){ // By Amount
+                        $discount = ($cart_row->qty*$cart_row->discount);
+                    }else{ // By percentage
+                        $discount = ($cart_row->qty*$cart_row->product->price)*($cart_row->discount/100);
+                    }
                     $cart_row->sub_total = ($request->qty*$cart_row->product->price)-($discount);
                     $cart_row->save();
 
@@ -216,11 +228,21 @@ class CartController extends Controller
     public function changeDiscount(Request $request){
         try{
             $user = auth()->user();
+            $checkbox_status = $request->status ?? $request->status;
+            
             $cart_row = Cart::findOrFail($request->id);
 
-            $cart_row->discount = $request->discount;
-            $discount = ($cart_row->qty*$cart_row->product->price)*($request->discount/100);
-            $cart_row->sub_total = ($cart_row->qty*$cart_row->product->price)-($discount);
+            $cart_row->discount = $request->discount; //Update the discount column
+            if(companyInfo()->discount_visibility == 1){
+                $discount = ($cart_row->qty*$request->discount);
+            }else if(companyInfo()->discount_visibility == 0 && companyInfo()->discount_mode == 0){ // By Amount
+                $discount = ($cart_row->qty*$request->discount);
+            }else{ // By percentage
+                $discount = ($cart_row->qty*$cart_row->product->price)*($request->discount/100);
+            }
+            
+            $cart_row->sub_total = ($cart_row->qty*$cart_row->product->price)-($discount); //Deduct discount
+            $cart_row->checkbox_status = $checkbox_status;
             $cart_row->save();
 
             // Update cart report
@@ -233,7 +255,7 @@ class CartController extends Controller
             $response = [
                 'status' => 1,
                 'icon' => 'info',
-                'message' => 'Discount of <strong>'.$request->discount.'%</strong> has be given for <strong>'.$cart_row->product->name .'</strong>!'
+                'message' => 'Discount of <strong>'.$discount.'</strong> has be given for <strong>'.$cart_row->product->name .'</strong>!'
             ];
         }catch(Exception $e){
             if($e->getMessage()){
@@ -245,7 +267,7 @@ class CartController extends Controller
             }
         }
 
-        $view = view('shop.partials.cart_display', compact('active_cart'))->render();
+        $view = view('shop.partials.cart_display', compact('active_cart', 'checkbox_status'))->render();
         return response()->json([
             'html' => $view,
             'json' => $response,
@@ -253,8 +275,6 @@ class CartController extends Controller
             'grand_total' => $grand_total
         ]);
     }
-
-
 
     // Add checkout method
     public function addCheckoutMethod(Request $request){
@@ -271,6 +291,9 @@ class CartController extends Controller
                     break;
                 case 3:
                     $method = "Bank Transfer";
+                    break;
+                case 4:
+                    $method = "Credit Sales";
                     break;
             }
 
@@ -300,10 +323,7 @@ class CartController extends Controller
             'pm_method_view' => $pm_method_view,
             'active_cart_id' => $active_cart_id
         ]);
-        
-
     }
-
 
     
     // Create new tab
@@ -325,7 +345,7 @@ class CartController extends Controller
 
                 $grand_total = 0;
             }else{
-                if($checkNumTabs->count() <= 3){
+                if($checkNumTabs->count() <= 10){
                     $savePreviousCart = Cart::where('cart_report_id', $request->active_tab)
                                             ->where('user_id', $user->id)        
                                             ->update(["status" => 1]);
@@ -393,22 +413,46 @@ class CartController extends Controller
         ]);
     }
 
+
     // Tab Requests
     public function tabRequest(Request $request){
         try{
             $request = (object) $request->all();
             $user = auth()->user();
-            $buyer = CartReport::where('id', $request->tab_id)->pluck('buyer')[0];
+            
+            if(!empty($request->tab_id)){
+                $status = 0; //Active
+                $tab_id = $request->tab_id;
+            }else if(!empty($request->invoice_code)){
+                $status = 2; // Active and searched by admin
+                $invoice = CartReport::where('invoice_code', $request->invoice_code)->first();
+                if(!$invoice){
+                    return [
+                        'error' => true,
+                        'status' => 1,
+                        'icon' => 'danger',
+                        'message' => "Invalid invoice code!"
+                    ];
+                }else{
+                    $tab_id = $invoice->id;
+                }
+            }
+
+            $buyer = CartReport::where('id', $tab_id)->pluck('buyer')[0];
+        
             if($request->query == "view"){
+                
                 // View tab
                 $deactivateOtherCarts = Cart::where('user_id', $user->id)
-                                            ->where('cart_report_id', '!=', $request->tab_id)
+                                            ->where('cart_report_id', '!=', $tab_id)
                                             ->update(["status" => 1]);
 
-                $activateSelectedTab = Cart::where('cart_report_id', $request->tab_id)->update(["status" => 0]); 
+                // Update Cart
+                $activateSelectedTab = Cart::where('cart_report_id', $tab_id)->update(["status" => $status]); 
+                
                 
                 // Get grand total
-                $grand_total = Cart::where('cart_report_id', $request->tab_id)->sum('sub_total');
+                $grand_total = Cart::where('cart_report_id', $tab_id)->sum('sub_total');
 
                 $response = [
                     'status' => 1,
@@ -417,7 +461,7 @@ class CartController extends Controller
                 ];
             }else if($request->query == "delete"){
                 // Delete tab
-                CartReport::where('id', $request->tab_id)->delete();
+                CartReport::where('id', $tab_id)->delete();
                 // Get grand total
                 $grand_total = Cart::where('status', 0)
                                     ->where('user_id', $user->id)
@@ -431,8 +475,15 @@ class CartController extends Controller
             
 
                 // Fetch Active Cart
-                $active_cart = Cart::where('status', 0)
+                if($status == 0){
+                    // Search with user ID
+                    $active_cart = Cart::where('status', $status)
                                 ->where('user_id', $user->id)->get();
+                }else if($status == 2){
+                    // Don't search with user ID
+                    $active_cart = Cart::where('status', $status)->get();
+                }
+                
                 if($active_cart->count() != 0){
                     $active_tab = $active_cart[0]->cart_report_id;
                 }else{
@@ -465,6 +516,8 @@ class CartController extends Controller
                 ];
             } 
         }
+
+        // return $response;
         $pm_method_view = view('shop.partials.payment_methods', compact('pm_method','active_cart_id'))->render();
         $view = view('shop.partials.cart_display', compact('active_cart',))->render();
         $tab_view = view('shop.partials.tab', compact('tabs','active_cart_id'))->render();
@@ -501,7 +554,7 @@ class CartController extends Controller
             $tabs = CartReport::where('user_id', $user->id)
                                 ->where('id', '!=', $active_cart_id)
                                 ->get();
-             // Payment Method 
+            // Payment Method 
             $pm_method = CartReport::where('id', $active_cart_id)->first();
 
             $response = [
@@ -532,7 +585,6 @@ class CartController extends Controller
         ]);
     }
 
-
     // Add buyer info
     public function addBuyerInfo(Request $request){
         try{
@@ -551,5 +603,7 @@ class CartController extends Controller
 
         return back();
     }
+
+    
     // End of controller
 }

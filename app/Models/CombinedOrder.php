@@ -13,6 +13,7 @@ class CombinedOrder extends Model
         'buyer_details',
         'grand_total',
         'user_id',
+        'trx_id',
         'status',
     ];
     

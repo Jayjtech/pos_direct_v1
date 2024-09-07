@@ -70,6 +70,8 @@ class SettingsController extends Controller
             $info->company_email = $request->company_email;
             $info->company_address = $request->company_address;
             $info->logo_status = $request->logo_status;
+            $info->discount_mode = $request->discount_mode;
+            $info->discount_visibility = $request->discount_visibility;
             $info->signature_status = $request->signature_status;
             $info->company_phones = json_encode([
                 $request->company_phone_i,

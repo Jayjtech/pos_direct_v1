@@ -16,11 +16,24 @@
                             id="{{ $ac->id }}" min="0.1" value="{{ $ac->qty }}">
                     </form>
                 </td>
-                <td width="25%" style="font-size:12px;">
-                    <form class="discount-form" method="post">
-                        <input type="number" style="font-size:11px;" id="{{ $ac->id }}" class="form-control"
-                            min="0" value="{{ $ac->discount }}">
-                    </form>
+
+                <td width="25%" style="font-size:12px;" class="text-center">
+                    @if (companyInfo()->discount_visibility == 1)
+                        @if (!empty($ac->pdt_discount))
+                            <div class="check-discount">
+                                <input type="checkbox" id="discount_{{ $ac->id }}" {{ $ac->checkbox_status }}>
+                                <label for="discount_{{ $ac->id }}" id="label_{{ $ac->id }}"
+                                    style="font-size:15px;">{{ $ac->pdt_discount }}</label>
+                            </div>
+                        @endif
+                    @else
+                        <form class="discount-form" method="post">
+                            <input type="number" style="font-size:11px;" id="{{ $ac->id }}" class="form-control"
+                                min="0" value="{{ $ac->discount }}"
+                                {{ companyInfo()->discount_visibility == 1 ? 'readonly' : '' }}>
+                        </form>
+                    @endif
+
                 </td>
                 <td width="10%" class="font-weight-bold">
                     {!! config('basic.c_s') !!}{{ number_format($ac->sub_total, 1) }}

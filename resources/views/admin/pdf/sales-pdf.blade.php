@@ -1,35 +1,49 @@
 @extends('layouts.pdf')
 @section('content')
     <div class="table table-responsive">
-        <p class="mb-2 font-weight-bold text-success">GRAND TOTAL:
-            {{ config('basic.currency') }}{{ number_format($grand_total, 2) }}</p>
-
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>S/N</th>
                     <th>Product</th>
-                    <th>Quantity sold </th>
+                    <th>Opening Qty</th>
+                    <th>Closing Qty</th>
+                    <th>Qty sold </th>
+                    <th>Discount given </th>
                     <th>Sub total </th>
                 </tr>
             </thead>
             <tbody>
                 @php
                     $n = 0;
+                    $total_qty = 0;
+                    $total_dic = 0;
+                    $total_oQ = 0;
+                    $total_cQ = 0;
                 @endphp
                 @forelse ($products as $product)
                     @php
-                        $n++;
+
                         /**Return sum of necessary columns*/
-                        $sum = getProductSales($startDate, $endDate, $product->id)->sum;
+                        $data = getProductSales($startDate, $endDate, $product->id);
                     @endphp
-                    @if ($sum->qty_total != null)
+                    @if ($data->sum->qty_total != null)
+                        @php
+                            $n++;
+                            $total_qty = $total_qty + $data->sum->qty_total;
+                            $total_dic = $total_dic + $data->sum->disc_total;
+                            $total_oQ = $total_oQ + $data->openingQty;
+                            $total_cQ = $total_cQ + $data->closingQty;
+                        @endphp
                         <tr>
                             <td>{{ $n }}</td>
                             <td>{{ $product->name }}</td>
-                            <td>{{ number_format($sum->qty_total, 1) }}</td>
+                            <td>{{ number_format($data->openingQty) }}</td>
+                            <td>{{ number_format($data->closingQty) }}</td>
+                            <td>{{ number_format($data->sum->qty_total) }}</td>
+                            <td>{{ config('basic.currency') }}{{ number_format($data->sum->disc_total) }}</td>
                             <td>
-                                {!! config('basic.currency') !!}{{ number_format($sum->grand_total, 2) }}</td>
+                                {{ config('basic.currency') }}{{ number_format($data->sum->grand_total, 2) }}</td>
                         </tr>
                     @endif
                 @empty
@@ -44,7 +58,14 @@
                         </p>
                     </tr>
                 @endif
-
+                <tr>
+                    <th colspan="2">Summary</th>
+                    <th>{{ number_format($total_oQ) }}</th>
+                    <th>{{ number_format($total_cQ) }}</th>
+                    <th>{{ number_format($total_qty) }}</th>
+                    <th>{{ config('basic.currency') }}{{ number_format($total_dic) }}</th>
+                    <th>{{ config('basic.currency') }}{{ number_format($grand_total) }}</th>
+                </tr>
             </tbody>
         </table>
 

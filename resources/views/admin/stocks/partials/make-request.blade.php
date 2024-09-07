@@ -20,8 +20,8 @@
                             </td>
 
                             <td>
-                                <input type="number" name="quantities[]" min="1" class="form-control"
-                                    placeholder="Quantity" required>
+                                <input type="number" name="quantities[]" class="form-control" placeholder="Quantity"
+                                    required>
                             </td>
 
                             <td>

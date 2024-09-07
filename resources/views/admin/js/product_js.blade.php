@@ -19,11 +19,13 @@
 
             // Delete product
             $(document).on('click', '.delete-product a', function() {
+                var deleteProductRoute = "{{ route('admin.delete.product', ':product_id') }}";
                 var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
                 var product_id = $(this).attr("data-id");
+                var route = deleteProductRoute.replace(':product_id', product_id);
 
                 $('.delete-modal-footer').html(
-                    `<p>Still want to proceed?</p> <a href="/admin/delete-product/${product_id}" class="btn btn-primary">Yes</a>
+                    `<p>Still want to proceed?</p> <a href="${route}" class="btn btn-primary">Yes</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
                 );
                 $('.delete-modal').html(
@@ -63,8 +65,6 @@
             })
 
 
-
-
             // CATEGORY
             // Edit category
             $(document).on('click', '.edit-category a', function() {
@@ -87,9 +87,10 @@
 
             // Delete category
             $(document).on('click', '.delete-category a', function() {
+                var deleteCategoryRoute = "{{ route('admin.delete.category', ':category_id') }}";
                 var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
                 var category_id = $(this).attr("data-id");
-                var route = {{ route('admin.delete.product', category_id) }}
+                var route = deleteCategoryRoute.replace(':category_id', category_id);
 
                 $('.delete-modal-footer').html(
                     `<p>Still want to proceed?</p> <a href="${route}" class="btn btn-primary">Yes</a>
@@ -99,7 +100,7 @@
                     `<span>Are you sure you want to delete <strong>${name}</strong>?</span>
                     <p class="font-weight-bold alert alert-danger">It is advisable not to delete any product category as all attached products will also be deleted; this is striclty recommended for accurate record-keeping! You can simply set the category's status to "Unavailable".</p>
                     `);
-            })
+            });
 
             // Add product
             $(document).on('click', '.add-category a', function() {
@@ -117,8 +118,6 @@
             })
 
         })
-
-
 
         const previewPdt = () => {
             var oFReader = new FileReader();
@@ -149,7 +148,3 @@
         };
     </script>
 @endpush
-
-
-{{-- SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`ekreqipn_pos_v2`.`stocks`, CONSTRAINT `stocks_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) (SQL: delete from `products` where `id` = 2) --}}
-{{-- QLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`ekreqipn_pos_v2`.`products`, CONSTRAINT `products_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) (SQL: delete from `categories` where `id` = 2) --}}

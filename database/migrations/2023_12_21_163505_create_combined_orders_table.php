@@ -19,6 +19,7 @@ class CreateCombinedOrdersTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->json('buyer_details')->nullable();
             $table->decimal('grand_total',11,2)->default(0);
+            $table->string('trx_id')->nullable();
             $table->integer('status')->default(0)->comment('0:pending, 1:completed, 2:refunded');
             $table->timestamps();
         });

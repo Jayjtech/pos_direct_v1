@@ -11,7 +11,7 @@
                         <button class="btn bg-white btn-sm dropdown-toggle btn-icon-text border mr-2" type="button"
                             id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="typcn typcn-calendar-outline"></i>
-                            {{ $tab->buyer ? $tab->buyer : 'Unknown buyer ' . $n }}
+                            {{ $tab->buyer ? $tab->buyer . ' | ' . ' I-ID: ' . strtoupper($tab->invoice_code) : 'I-ID: ' . strtoupper($tab->invoice_code) }}
                         </button>
                         <div class="dropdown-menu tab-nav" aria-labelledby="dropdownMenuSizeButton3"
                             data-x-placement="top-start">
@@ -37,14 +37,26 @@
                         </a>
                     </div>
                 </div>
-                <div class="mb-3 mb-xl-0 pr-1">
+
+                @can('generate-receipt')
+                    <div class="mb-3 mb-xl-0 pr-1">
+                        <div class="dropdown">
+                            <a href="#{{ $active_cart_id }}"
+                                class="print-receipt btn btn-danger btn-sm btn-icon-text border mr-2">
+                                <i class="mdi mdi-printer"></i>
+                            </a>
+                        </div>
+                    </div>
+                @endcan
+
+                {{-- <div class="mb-3 mb-xl-0 pr-1">
                     <div class="dropdown">
                         <a href="#{{ $active_cart_id }}"
-                            class="print-receipt btn btn-danger btn-sm btn-icon-text border mr-2">
-                            <i class="mdi mdi-printer"></i>
+                            class="save-invoice btn btn-success btn-sm btn-icon-text border mr-2">
+                            <i class="mdi mdi-content-save"></i>
                         </a>
                     </div>
-                </div>
+                </div> --}}
 
                 <script>
                     var generateReceiptRoute = "{{ route('generate.receipt', ['id' => ':id']) }}";

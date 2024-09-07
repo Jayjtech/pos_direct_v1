@@ -143,7 +143,66 @@
                                 </div>
                             </div>
 
-                            <div class="col-sm-6 mt-3 mb-3" align="right">
+                            <div class="col-sm-3 mt-3">
+                                <div class="form-group">
+                                    <label for="discount_mode">Shop: Product discount mode</label>
+                                    <select name="discount_mode" class="form-control">
+                                        <option
+                                            value="{{ companyInfo()->discount_mode }}  
+                                        ">
+                                            @if (companyInfo()->discount_mode == 1)
+                                                By Percentage
+                                            @else
+                                                By Amount
+                                            @endif
+                                        </option>
+
+                                        <option
+                                            value="
+                                        @if (companyInfo()->discount_mode == 1) 0
+                                            @else
+                                            1 @endif
+                                        ">
+                                            @if (companyInfo()->discount_mode == 1)
+                                                By Amount
+                                            @else
+                                                By Percentage
+                                            @endif
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mt-3">
+                                <div class="form-group">
+                                    <label for="discount_visibility">Discount Visibility</label>
+                                    <select name="discount_visibility" class="form-control">
+                                        <option
+                                            value="{{ companyInfo()->discount_visibility }}  
+                                        ">
+                                            @if (companyInfo()->discount_visibility == 1)
+                                                By Admin
+                                            @else
+                                                By Sales person
+                                            @endif
+                                        </option>
+
+                                        <option
+                                            value="
+                                        @if (companyInfo()->discount_visibility == 1) 0
+                                            @else
+                                            1 @endif
+                                        ">
+                                            @if (companyInfo()->discount_visibility == 1)
+                                                By Sales person
+                                            @else
+                                                By Admin
+                                            @endif
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12 mt-3 mb-3" align="right">
                                 <button type="submit" class="btn btn-primary">Save changes</button>
                             </div>
                         </div>

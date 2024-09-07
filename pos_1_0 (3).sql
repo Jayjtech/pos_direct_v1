@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 27, 2024 at 06:21 PM
+-- Generation Time: Sep 05, 2024 at 08:19 AM
 -- Server version: 10.4.24-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -37,6 +37,8 @@ CREATE TABLE `carts` (
   `price` decimal(11,1) NOT NULL DEFAULT 0.0,
   `sub_total` decimal(11,1) NOT NULL DEFAULT 0.0,
   `discount` decimal(11,1) NOT NULL DEFAULT 0.0,
+  `pdt_discount` int(11) DEFAULT NULL,
+  `checkbox_status` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 0 COMMENT '0: active, 1: saved',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -46,10 +48,15 @@ CREATE TABLE `carts` (
 -- Dumping data for table `carts`
 --
 
-INSERT INTO `carts` (`id`, `user_id`, `cart_report_id`, `tab_no`, `product_id`, `qty`, `price`, `sub_total`, `discount`, `status`, `created_at`, `updated_at`) VALUES
-(23, 1, 9, 0, 3, '1.0', '105000.0', '101850.0', '3.0', 0, '2024-01-26 13:33:59', '2024-01-26 13:34:08'),
-(24, 1, 9, 0, 5, '1.0', '6000.0', '6000.0', '0.0', 0, '2024-01-26 13:34:12', '2024-01-26 13:34:12'),
-(25, 1, 9, 0, 2, '1.0', '250000.0', '250000.0', '0.0', 0, '2024-01-26 17:12:03', '2024-01-26 17:12:03');
+INSERT INTO `carts` (`id`, `user_id`, `cart_report_id`, `tab_no`, `product_id`, `qty`, `price`, `sub_total`, `discount`, `pdt_discount`, `checkbox_status`, `status`, `created_at`, `updated_at`) VALUES
+(69, 2, 34, 0, 2, '1.0', '250000.0', '250000.0', '0.0', 25000, 'unchecked', 2, '2024-09-02 20:02:08', '2024-09-02 23:55:01'),
+(70, 2, 34, 0, 1, '1.0', '150000.0', '149500.0', '500.0', 500, 'checked', 2, '2024-09-02 20:02:31', '2024-09-02 23:55:01'),
+(98, 2, 34, 0, 3, '1.0', '105000.0', '105000.0', '0.0', NULL, 'unchecked', 2, '2024-09-02 23:04:04', '2024-09-02 23:55:01'),
+(99, 2, 34, 0, 4, '1.0', '500.0', '500.0', '0.0', NULL, 'unchecked', 2, '2024-09-02 23:52:16', '2024-09-02 23:55:01'),
+(109, 1, 44, 0, 4, '1.0', '500.0', '500.0', '0.0', NULL, 'unchecked', 0, '2024-09-04 05:38:48', '2024-09-04 11:07:08'),
+(110, 1, 43, 0, 2, '1.0', '250000.0', '250000.0', '0.0', 25000, 'unchecked', 1, '2024-09-04 05:38:48', '2024-09-04 11:07:08'),
+(111, 1, 44, 0, 2, '1.0', '250000.0', '225000.0', '25000.0', 25000, 'checked', 0, '2024-09-04 05:38:49', '2024-09-04 11:12:53'),
+(112, 1, 44, 0, 1, '1.0', '150000.0', '135000.0', '15000.0', 15000, 'checked', 0, '2024-09-04 05:38:51', '2024-09-04 11:12:47');
 
 -- --------------------------------------------------------
 
@@ -61,6 +68,7 @@ CREATE TABLE `cart_reports` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `buyer` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `invoice_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `address` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `payment_method` int(11) NOT NULL DEFAULT 0 COMMENT '0:Cash, 1:Credit card, 2:Bank transfer',
@@ -73,8 +81,10 @@ CREATE TABLE `cart_reports` (
 -- Dumping data for table `cart_reports`
 --
 
-INSERT INTO `cart_reports` (`id`, `user_id`, `buyer`, `phone`, `address`, `payment_method`, `grand_total`, `created_at`, `updated_at`) VALUES
-(9, 1, NULL, NULL, NULL, 0, '357850.0', '2024-01-26 13:33:59', '2024-01-26 17:12:03');
+INSERT INTO `cart_reports` (`id`, `user_id`, `buyer`, `invoice_code`, `phone`, `address`, `payment_method`, `grand_total`, `created_at`, `updated_at`) VALUES
+(34, 2, 'Olamide', 'yfhot172', NULL, NULL, 2, '505000.0', '2024-09-02 20:02:08', '2024-09-02 23:54:56'),
+(43, 1, NULL, 'c0he1172', NULL, NULL, 4, '250000.0', '2024-09-04 05:38:48', '2024-09-04 11:06:50'),
+(44, 1, 'Oluwafemi', 'nbm2n172', NULL, NULL, 2, '360500.0', '2024-09-04 05:38:48', '2024-09-04 11:12:53');
 
 -- --------------------------------------------------------
 
@@ -115,6 +125,7 @@ CREATE TABLE `combined_orders` (
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `buyer_details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`buyer_details`)),
   `grand_total` decimal(11,2) NOT NULL DEFAULT 0.00,
+  `trx_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` int(11) NOT NULL DEFAULT 0 COMMENT '0:pending, 1:completed, 2:refunded',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -124,14 +135,22 @@ CREATE TABLE `combined_orders` (
 -- Dumping data for table `combined_orders`
 --
 
-INSERT INTO `combined_orders` (`id`, `user_id`, `buyer_details`, `grand_total`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '68300.00', 1, '2024-01-08 11:42:45', '2024-01-08 11:42:45'),
-(2, 1, '{\"buyer\":\"John smith\",\"phone\":\"07034876144\",\"address\":\"John mark str\",\"payment_method\":\"Credit card\"}', '505000.00', 1, '2024-01-08 11:43:54', '2024-01-08 11:43:54'),
-(3, 1, '{\"buyer\":\"Adeosun Solomon\",\"phone\":\"07034876144\",\"address\":\"Igberen Ota, Ogun state\",\"payment_method\":\"Credit card\"}', '361500.00', 1, '2024-01-10 07:02:44', '2024-01-10 07:02:44'),
-(4, 1, '{\"buyer\":\"Adewale Adebisi\",\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '1200920.00', 1, '2024-01-10 08:24:09', '2024-01-10 08:24:09'),
-(5, 1, '{\"buyer\":\"Miss Folakemi\",\"phone\":null,\"address\":null,\"payment_method\":\"Cash\"}', '940000.00', 1, '2024-01-10 08:52:37', '2024-01-10 08:52:37'),
-(6, 1, '{\"buyer\":\"Olumide\",\"phone\":\"07069056472\",\"address\":\"Dalemo street\",\"payment_method\":\"Credit card\"}', '105500.00', 1, '2024-01-10 22:10:35', '2024-01-10 22:10:35'),
-(7, 1, '{\"buyer\":\"Adewale Adebisi\",\"phone\":\"07034876144\",\"address\":\"Merryland Igberen Ota, Ogun state\",\"payment_method\":\"Bank transfer\"}', '107500.00', 1, '2024-01-17 21:07:48', '2024-01-17 21:09:33');
+INSERT INTO `combined_orders` (`id`, `user_id`, `buyer_details`, `grand_total`, `trx_id`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '68300.00', '', 1, '2024-01-08 11:42:45', '2024-01-08 11:42:45'),
+(2, 1, '{\"buyer\":\"John smith\",\"phone\":\"07034876144\",\"address\":\"John mark str\",\"payment_method\":\"Credit card\"}', '505000.00', '', 1, '2024-01-08 11:43:54', '2024-01-08 11:43:54'),
+(3, 1, '{\"buyer\":\"Adeosun Solomon\",\"phone\":\"07034876144\",\"address\":\"Igberen Ota, Ogun state\",\"payment_method\":\"Credit card\"}', '361500.00', '', 1, '2024-01-10 07:02:44', '2024-01-10 07:02:44'),
+(4, 1, '{\"buyer\":\"Adewale Adebisi\",\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '1200920.00', '', 1, '2024-01-10 08:24:09', '2024-01-10 08:24:09'),
+(5, 1, '{\"buyer\":\"Miss Folakemi\",\"phone\":null,\"address\":null,\"payment_method\":\"Cash\"}', '940000.00', '', 1, '2024-01-10 08:52:37', '2024-01-10 08:52:37'),
+(6, 1, '{\"buyer\":\"Olumide\",\"phone\":\"07069056472\",\"address\":\"Dalemo street\",\"payment_method\":\"Credit card\"}', '105500.00', '', 1, '2024-01-10 22:10:35', '2024-01-10 22:10:35'),
+(7, 1, '{\"buyer\":\"Adewale Adebisi\",\"phone\":\"07034876144\",\"address\":\"Merryland Igberen Ota, Ogun state\",\"payment_method\":\"Bank transfer\"}', '107500.00', '', 1, '2024-01-17 21:07:48', '2024-01-17 21:09:33'),
+(8, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Bank transfer\"}', '156450.00', '', 1, '2024-07-16 14:06:23', '2024-07-16 14:06:23'),
+(9, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '400000.00', '', 1, '2024-07-16 14:20:13', '2024-07-16 14:20:13'),
+(10, 1, '{\"buyer\":\"Tab_2\",\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '505000.00', '', 1, '2024-08-31 18:08:09', '2024-08-31 18:08:09'),
+(11, 1, '{\"buyer\":\"Oluwafemi\",\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '606500.00', '', 1, '2024-09-04 04:05:10', '2024-09-04 04:05:10'),
+(12, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '225500.00', '', 1, '2024-09-04 04:09:19', '2024-09-04 04:09:19'),
+(13, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Bank transfer\"}', '465000.00', '', 1, '2024-09-04 04:10:49', '2024-09-04 04:10:49'),
+(14, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Credit card\"}', '261000.00', '', 1, '2024-09-04 04:55:35', '2024-09-04 04:55:35'),
+(15, 1, '{\"buyer\":null,\"phone\":null,\"address\":null,\"payment_method\":\"Bank transfer\"}', '231500.00', 'znf4w172', 1, '2024-09-04 05:14:45', '2024-09-04 05:14:45');
 
 -- --------------------------------------------------------
 
@@ -209,7 +228,8 @@ CREATE TABLE `model_has_roles` (
 --
 
 INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
-(1, 'App\\Models\\User', 1);
+(1, 'App\\Models\\User', 1),
+(4, 'App\\Models\\User', 2);
 
 -- --------------------------------------------------------
 
@@ -256,7 +276,29 @@ INSERT INTO `orders` (`id`, `combined_order_id`, `user_id`, `product_id`, `produ
 (15, 6, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.0', '105000.0', '105000.0', '0.0', '2024-01-10 22:10:36', '2024-01-10 22:10:36'),
 (16, 7, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.0', '105000.0', '105000.0', '0.0', '2024-01-17 21:07:48', '2024-01-17 21:07:48'),
 (17, 7, 1, 1, 'Laptop', '89039949004', NULL, 2, '7.0', '150000.0', '945000.0', '10.0', '2024-01-17 21:07:48', '2024-01-17 21:09:33'),
-(18, 7, 1, 4, 'Water melon', '90935990434', NULL, 1, '5.0', '500.0', '2500.0', '0.0', '2024-01-17 21:07:48', '2024-01-17 21:07:48');
+(18, 7, 1, 4, 'Water melon', '90935990434', NULL, 1, '5.0', '500.0', '2500.0', '0.0', '2024-01-17 21:07:48', '2024-01-17 21:07:48'),
+(19, 8, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.5', '105000.0', '156450.0', '700.0', '2024-07-16 14:06:23', '2024-07-16 14:06:23'),
+(20, 9, 1, 1, 'Laptop', '89039949004', NULL, 1, '1.0', '150000.0', '150000.0', '0.0', '2024-07-16 14:20:13', '2024-07-16 14:20:13'),
+(21, 9, 1, 2, 'Samsung S23', '89039949234', NULL, 1, '1.0', '250000.0', '250000.0', '0.0', '2024-07-16 14:20:13', '2024-07-16 14:20:13'),
+(22, 10, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.0', '105000.0', '105000.0', '0.0', '2024-08-31 18:08:09', '2024-08-31 18:08:09'),
+(23, 10, 1, 2, 'Samsung S23', '89039949234', NULL, 1, '1.0', '250000.0', '250000.0', '0.0', '2024-08-31 18:08:09', '2024-08-31 18:08:09'),
+(24, 10, 1, 1, 'Laptop', '89039949004', NULL, 1, '1.0', '150000.0', '150000.0', '0.0', '2024-08-31 18:08:09', '2024-08-31 18:08:09'),
+(25, 11, 1, 1, 'Laptop', '89039949004', NULL, 1, '2.0', '150000.0', '270000.0', '15000.0', '2024-09-04 04:05:10', '2024-09-04 04:05:10'),
+(26, 11, 1, 2, 'Samsung S23', '89039949234', NULL, 1, '1.0', '250000.0', '225000.0', '25000.0', '2024-09-04 04:05:10', '2024-09-04 04:05:10'),
+(27, 11, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.0', '105000.0', '105000.0', '0.0', '2024-09-04 04:05:10', '2024-09-04 04:05:10'),
+(28, 11, 1, 5, 'Chicken', '98948478733', NULL, 1, '1.0', '6000.0', '6000.0', '0.0', '2024-09-04 04:05:10', '2024-09-04 04:05:10'),
+(29, 11, 1, 4, 'Water melon', '90935990434', NULL, 1, '1.0', '500.0', '500.0', '0.0', '2024-09-04 04:05:10', '2024-09-04 04:05:10'),
+(30, 12, 1, 4, 'Water melon', '90935990434', NULL, 1, '1.0', '500.0', '500.0', '0.0', '2024-09-04 04:09:19', '2024-09-04 04:09:19'),
+(31, 12, 1, 2, 'Samsung S23', '89039949234', NULL, 1, '1.0', '250000.0', '225000.0', '25000.0', '2024-09-04 04:09:19', '2024-09-04 04:09:19'),
+(32, 13, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.0', '105000.0', '105000.0', '0.0', '2024-09-04 04:10:49', '2024-09-04 04:10:49'),
+(33, 13, 1, 2, 'Samsung S23', '89039949234', NULL, 1, '1.0', '250000.0', '225000.0', '25000.0', '2024-09-04 04:10:49', '2024-09-04 04:10:49'),
+(34, 13, 1, 1, 'Laptop', '89039949004', NULL, 1, '1.0', '150000.0', '135000.0', '15000.0', '2024-09-04 04:10:49', '2024-09-04 04:10:49'),
+(35, 14, 1, 5, 'Chicken', '98948478733', NULL, 1, '1.0', '6000.0', '6000.0', '0.0', '2024-09-04 04:55:35', '2024-09-04 04:55:35'),
+(36, 14, 1, 3, 'LG Television', '8498573924', NULL, 1, '1.0', '105000.0', '105000.0', '0.0', '2024-09-04 04:55:35', '2024-09-04 04:55:35'),
+(37, 14, 1, 1, 'Laptop', '89039949004', NULL, 1, '1.0', '150000.0', '150000.0', '0.0', '2024-09-04 04:55:35', '2024-09-04 04:55:35'),
+(38, 15, 1, 5, 'Chicken', '98948478733', NULL, 1, '1.0', '6000.0', '6000.0', '0.0', '2024-09-04 05:14:45', '2024-09-04 05:14:45'),
+(39, 15, 1, 4, 'Water melon', '90935990434', NULL, 1, '1.0', '500.0', '500.0', '0.0', '2024-09-04 05:14:45', '2024-09-04 05:14:45'),
+(40, 15, 1, 2, 'Samsung S23', '89039949234', NULL, 1, '1.0', '250000.0', '225000.0', '25000.0', '2024-09-04 05:14:45', '2024-09-04 05:14:45');
 
 -- --------------------------------------------------------
 
@@ -344,6 +386,9 @@ CREATE TABLE `products` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category_id` bigint(20) UNSIGNED NOT NULL,
   `price` decimal(11,2) NOT NULL DEFAULT 0.00,
+  `discount_amount` int(11) DEFAULT 0,
+  `discount_percent` int(11) DEFAULT 0,
+  `discount_mode` int(11) NOT NULL DEFAULT 0,
   `product_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `barcode` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `availability` decimal(11,2) NOT NULL DEFAULT 0.00,
@@ -357,14 +402,16 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `category_id`, `price`, `product_code`, `barcode`, `availability`, `img`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Laptop', 2, '150000.00', '89039949004', NULL, '2.00', '1704991223.png', 1, '2024-01-08 11:09:15', '2024-01-17 21:07:48'),
-(2, 'Samsung S23', 2, '250000.00', '89039949234', NULL, '6.00', NULL, 1, '2024-01-08 11:14:33', '2024-01-10 08:52:38'),
-(3, 'LG Television', 2, '105000.00', '8498573924', NULL, '1.00', NULL, 1, '2024-01-08 11:20:25', '2024-01-17 21:07:48'),
-(4, 'Water melon', 2, '500.00', '90935990434', NULL, '6.00', '1704717343.png', 1, '2024-01-08 11:35:43', '2024-01-17 21:07:48'),
-(5, 'Chicken', 2, '6000.00', '98948478733', NULL, '1.20', '1704717428.png', 1, '2024-01-08 11:37:08', '2024-01-10 08:24:09'),
-(6, 'House', 2, '120000.00', '84777477264', NULL, '0.00', '1704785985.jpg', 1, '2024-01-09 06:39:46', '2024-01-10 06:46:07'),
-(7, 'DVD player', 2, '5000.00', '63929846823', NULL, '0.00', '1704872794.png', 1, '2024-01-10 06:46:07', '2024-01-10 06:46:38');
+INSERT INTO `products` (`id`, `name`, `category_id`, `price`, `discount_amount`, `discount_percent`, `discount_mode`, `product_code`, `barcode`, `availability`, `img`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Laptop', 2, '150000.00', 500, 10, 1, '89039949004', NULL, '10.00', '1704991223.png', 1, '2024-01-08 11:09:15', '2024-09-04 04:55:35'),
+(2, 'Samsung S23', 2, '250000.00', 25000, 10, 0, '89039949234', NULL, '9.00', NULL, 1, '2024-01-08 11:14:33', '2024-09-04 05:14:45'),
+(3, 'LG Television', 2, '105000.00', NULL, NULL, 0, '8498573924', NULL, '-0.50', NULL, 1, '2024-01-08 11:20:25', '2024-09-04 04:55:35'),
+(4, 'Water melon', 2, '500.00', NULL, NULL, 0, '90935990434', NULL, '3.00', '1704717343.png', 1, '2024-01-08 11:35:43', '2024-09-04 05:14:45'),
+(5, 'Chicken', 2, '6000.00', NULL, NULL, 0, '98948478733', NULL, '-1.80', '1704717428.png', 1, '2024-01-08 11:37:08', '2024-09-04 05:14:45'),
+(6, 'House', 2, '120000.00', NULL, NULL, 0, '84777477264', NULL, '0.00', '1704785985.jpg', 1, '2024-01-09 06:39:46', '2024-01-10 06:46:07'),
+(7, 'DVD player', 2, '5000.00', NULL, NULL, 0, '63929846823', NULL, '0.00', '1704872794.png', 1, '2024-01-10 06:46:07', '2024-01-10 06:46:38'),
+(8, 'Food basket', 8, '50000.00', 0, 0, 0, '74873687473939', NULL, '0.00', NULL, 1, '2024-09-02 15:01:48', '2024-09-02 15:01:48'),
+(9, 'Gala Chin Chin', 8, '600.00', 10, 5, 0, '7893847788392', NULL, '0.00', NULL, 1, '2024-09-02 15:08:28', '2024-09-02 15:08:28');
 
 -- --------------------------------------------------------
 
@@ -388,7 +435,8 @@ INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VAL
 (1, 'Super Admin', 'web', '2024-01-08 10:04:06', '2024-01-08 10:04:06'),
 (2, 'Cashier', 'web', '2024-01-08 10:04:06', '2024-01-08 10:04:06'),
 (3, 'Stock keeper', 'web', '2024-01-08 10:04:06', '2024-01-08 10:04:06'),
-(4, 'Sales person', 'web', '2024-01-08 10:04:06', '2024-01-08 10:04:06');
+(4, 'Sales person', 'web', '2024-01-08 10:04:06', '2024-01-08 10:04:06'),
+(5, 'generate-invoice', 'web', '2024-09-02 23:14:05', '2024-09-02 23:14:05');
 
 -- --------------------------------------------------------
 
@@ -407,8 +455,10 @@ CREATE TABLE `role_has_permissions` (
 
 INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 (1, 1),
+(1, 4),
 (2, 1),
 (3, 1),
+(3, 4),
 (4, 1),
 (5, 1),
 (6, 1),
@@ -430,7 +480,8 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 (22, 1),
 (23, 1),
 (24, 1),
-(25, 1);
+(25, 1),
+(25, 4);
 
 -- --------------------------------------------------------
 
@@ -448,6 +499,8 @@ CREATE TABLE `settings` (
   `company_signature` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `logo_status` int(11) NOT NULL DEFAULT 0,
   `signature_status` int(11) NOT NULL DEFAULT 0,
+  `discount_mode` int(11) NOT NULL DEFAULT 0,
+  `discount_visibility` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -456,8 +509,8 @@ CREATE TABLE `settings` (
 -- Dumping data for table `settings`
 --
 
-INSERT INTO `settings` (`id`, `company_name`, `company_address`, `company_phones`, `company_email`, `company_logo`, `company_signature`, `logo_status`, `signature_status`, `created_at`, `updated_at`) VALUES
-(1, 'POS Management System', 'Ota, Ogun State', '[\"07034876144\",\"07069056472\"]', 'jayjtech5@gmail.com', '1704921566.png', 'default_signature.png', 1, 1, '2024-01-08 10:04:06', '2024-01-10 21:19:28');
+INSERT INTO `settings` (`id`, `company_name`, `company_address`, `company_phones`, `company_email`, `company_logo`, `company_signature`, `logo_status`, `signature_status`, `discount_mode`, `discount_visibility`, `created_at`, `updated_at`) VALUES
+(1, 'POS Management System', 'Ota, Ogun State', '[\"07034876144\",\"07069056472\"]', 'jayjtech5@gmail.com', '1712573340.png', 'default_signature.png', 1, 1, 0, 1, '2024-01-08 10:04:06', '2024-09-02 15:25:05');
 
 -- --------------------------------------------------------
 
@@ -491,7 +544,14 @@ INSERT INTO `stocks` (`id`, `user_id`, `product_id`, `product`, `product_code`, 
 (4, 1, 2, 'Samsung S23', '89039949234', NULL, '16.0', '0.00', '16.00', 1, '2024-01-08 11:39:22', '2024-01-08 11:40:04'),
 (5, 1, 1, 'Laptop', '89039949004', NULL, '12.0', '0.00', '12.00', 1, '2024-01-08 11:39:22', '2024-01-08 11:40:04'),
 (6, 1, 1, 'Laptop', '89039949004', NULL, '5.0', '0.00', '0.00', 1, '2024-01-09 04:15:03', '2024-01-10 22:55:38'),
-(7, 1, 2, 'Samsung S23', '89039949234', NULL, '6.0', '0.00', '0.00', 1, '2024-01-09 04:15:03', '2024-01-10 22:55:38');
+(7, 1, 2, 'Samsung S23', '89039949234', NULL, '6.0', '0.00', '0.00', 1, '2024-01-09 04:15:03', '2024-01-10 22:55:38'),
+(8, 1, 1, 'Laptop', '89039949004', NULL, '10.0', '0.00', '0.00', 1, '2024-02-17 17:13:05', '2024-02-17 17:13:32'),
+(9, 1, 2, 'Samsung S23', '89039949234', NULL, '5.0', '0.00', '0.00', 1, '2024-02-17 17:13:05', '2024-02-17 17:13:32'),
+(10, 1, 1, 'Laptop', '89039949004', NULL, '10.0', '2.00', '12.00', 1, '2024-02-17 17:14:24', '2024-02-17 17:14:34'),
+(11, 1, 2, 'Samsung S23', '89039949234', NULL, '6.0', '6.00', '12.00', 1, '2024-02-17 17:14:24', '2024-02-17 17:14:34'),
+(12, 1, 1, 'Laptop', '89039949004', NULL, '4.0', '12.00', '16.00', 1, '2024-02-17 17:24:43', '2024-02-17 17:25:02'),
+(13, 1, 2, 'Samsung S23', '89039949234', NULL, '3.0', '12.00', '15.00', 1, '2024-02-17 17:24:43', '2024-02-17 17:25:02'),
+(14, 1, 3, 'LG Television', '8498573924', NULL, '4.0', '1.00', '5.00', 1, '2024-02-17 17:24:43', '2024-02-17 17:25:02');
 
 -- --------------------------------------------------------
 
@@ -515,7 +575,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Main Admin', 'admin@pos.com', NULL, '$2y$10$ihBBpSkH2mE.CATD9YF7dO.ZBAm//EEak9eBQQESjLl34dgOxO0Qa', NULL, '2024-01-08 10:04:06', '2024-01-08 10:04:06');
+(1, 'Main Admin', 'admin@pos.com', NULL, '$2y$10$ihBBpSkH2mE.CATD9YF7dO.ZBAm//EEak9eBQQESjLl34dgOxO0Qa', NULL, '2024-01-08 10:04:06', '2024-01-08 10:04:06'),
+(2, 'Oluwafemi', 'jayjtech5@gmail.com', NULL, '$2y$10$kdOokxA91nR.czWCKi8xbeIBge7fP6QXOJCgRaJ8KVELyMaVmoF8y', NULL, '2024-09-01 20:31:20', '2024-09-01 20:31:20');
 
 --
 -- Indexes for dumped tables
@@ -658,13 +719,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 
 --
 -- AUTO_INCREMENT for table `cart_reports`
 --
 ALTER TABLE `cart_reports`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -676,7 +737,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `combined_orders`
 --
 ALTER TABLE `combined_orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -694,13 +755,13 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -712,13 +773,13 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -730,13 +791,13 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `stocks`
 --
 ALTER TABLE `stocks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

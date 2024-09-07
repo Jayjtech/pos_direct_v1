@@ -49,9 +49,14 @@ class ProductController extends Controller
         }
         $product->name = $request->name;
         $product->price = $request->price;
+        $product->discount_amount = $request->discount_amount;
+        $product->discount_percent = $request->discount_percent;
+        $product->discount_mode = $request->discount_mode;
         $product->status = $request->status;
         $product->product_code = $request->product_code;
         $product->category_id = $request->category_id;
+
+        // return $product;
         
         if($request->file('pdt_img') != null){
             if(!empty($product->img)){
@@ -141,6 +146,9 @@ class ProductController extends Controller
         Product::create([
             'name' => $request->name,
             'price' => $request->price,
+            'discount_mode' => $request->discount_mode,
+            'discount_amount' => $request->discount_amount,
+            'discount_percent' => $request->discount_percent,
             'status' => $request->status,
             'product_code' => $request->product_code,
             'category_id' => $request->category_id,

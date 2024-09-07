@@ -11,20 +11,22 @@
                 <div class="d-flex align-items-center justify-content-md-end">
                     <div class="mb-3 mb-xl-0 pr-1">
                         <div class="">
-                            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-secondary"><i
-                                    class="typcn typcn-device-desktop menu-icon"></i> Dashboard</a>
+                            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-secondary" style="font-size:11px;"><i
+                                    class="typcn typcn-device-desktop menu-icon" style="font-size:11px;"></i> Dashboard</a>
                         </div>
                     </div>
                     <div class="pr-1 mb-3 mr-2 mb-xl-0">
-                        <button type="button" class="btn btn-sm btn-primary new-tab"
+                        <button type="button" class="btn btn-sm btn-success new-tab"
                             active-tab="{{ $active_cart->count() ? $active_cart[0]->cartReport->id : null }}"><i
-                                class="mdi mdi-plus"></i> New
-                            Tab</button>
+                                style="font-size:11px;" class="mdi mdi-content-save"> Invoice / New
+                                Tab</i> </button>
                     </div>
-                    <div class="pr-1 mb-3 mb-xl-0">
-                        <button type="button" class="btn btn-sm bg-white btn-icon-text border"><i
-                                class="typcn typcn-info-large-outline mr-2"></i>info</button>
-                    </div>
+
+                    @can('generate-receipt')
+                        <div class="pr-1 mb-3 mr-2 mb-xl-0">
+                            <input type="text" class="form-control get-invoice" placeholder="Enter Invoice ID">
+                        </div>
+                    @endcan
                 </div>
             </div>
 

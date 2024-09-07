@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Setting;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
@@ -182,23 +183,60 @@ if(!function_exists('createCompanyInfo')){
 
 if(!function_exists('getProductSales')){
     function getProductSales($startDate, $endDate, $product_id){
+        // Step 1: Get the total sum for the current date range
         if($startDate == $endDate){
             $sum = Order::where('product_id', $product_id)
                                     ->whereDate('created_at', $startDate)
-                                    ->where('status', '!=', 2) //Refunded
-                                    ->selectRaw('sum(qty) as qty_total, sum(sub_total) as grand_total, sum(discount) as disc_total')->first();
-        }else{
+                                    ->where('status', '!=', 2) // Refunded
+                                    ->selectRaw('sum(qty) as qty_total, sum(sub_total) as grand_total, sum(discount) as disc_total')
+                                    ->first();
+        } else {
             $sum = Order::where('product_id', $product_id)
                                 ->whereBetween('created_at', [$startDate, $endDate])
-                                ->where('status', '!=', 2) //Refunded
-                                ->selectRaw('sum(qty) as qty_total, sum(sub_total) as grand_total, sum(discount) as disc_total')->first();
+                                ->where('status', '!=', 2) // Refunded
+                                ->selectRaw('sum(qty) as qty_total, sum(sub_total) as grand_total, sum(discount) as disc_total')
+                                ->first();
         }
 
+        // Step 2: Get the previous day orders (subtract one day from $startDate)
+        $prevDay = Carbon::parse($startDate)->subDay();
+
+        // Handle potential null values for previous day orders
+        $yesterdayOrderSum = Order::where('product_id', $product_id)
+                                  ->whereDate('created_at', $prevDay)
+                                  ->where('status', '!=', 2) // Refunded
+                                  ->selectRaw('sum(qty) as qty_total')
+                                  ->first();
+
+        $yesterdayQty = $yesterdayOrderSum ? $yesterdayOrderSum->qty_total : 0; // If no orders, set to 0
+
+        // Step 3: Get the product's available quantity
+        $availablePdt = Product::where('id', $product_id)->first();
+
+        // Calculate opening quantity
+        if ($availablePdt) {
+            // Step 4: Get total quantity sold since $startDate till now
+            $totalSoldSinceStartDate = Order::where('product_id', $product_id)
+                                            ->whereDate('created_at', '>=', $startDate)
+                                            ->where('status', '!=', 2) // Refunded
+                                            ->sum('qty');
+
+            // Opening quantity is current availability + total sold since $startDate
+            $openingQty = $availablePdt->availability + $totalSoldSinceStartDate;
+        } else {
+            // Handle if the product doesn't exist (optional)
+            $openingQty = $yesterdayQty; // No product, so use yesterday's qty
+        }
+
+        // Step 5: Return the results as an object
         return (object) [
             'sum' => $sum,
+            'openingQty' => $openingQty,
+            'closingQty' => $availablePdt ? $availablePdt->availability : 0
         ];
     }
 }
+
 
 if(!function_exists('companyInfo')){
     function companyInfo(){

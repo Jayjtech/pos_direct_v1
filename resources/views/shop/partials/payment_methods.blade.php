@@ -14,7 +14,7 @@
                     <div class="dropdown">
                         <button type="button"
                             class="btn btn-sm @if ($pm_method->payment_method == 1) btn-primary @else bg-white @endif btn-icon-text border"
-                            style="font-size: 10px;" data-cart-report-id="{{ $active_cart_id }}" data-id="1"><i
+                            style="font-size: 9px;" data-cart-report-id="{{ $active_cart_id }}" data-id="1"><i
                                 class="typcn typcn-cash mr-2"></i>{{ __('CASH') }}</button>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
                     <div class="dropdown">
                         <button type="button"
                             class="btn btn-sm @if ($pm_method->payment_method == 2) btn-primary @else bg-white @endif btn-icon-text border"
-                            style="font-size: 10px;" data-cart-report-id="{{ $active_cart_id }}" data-id="2"><i
+                            style="font-size: 9px;" data-cart-report-id="{{ $active_cart_id }}" data-id="2"><i
                                 class="typcn typcn-credit-card mr-2"></i>{{ __('CREDIT CARD') }}</button>
                     </div>
                 </div>
@@ -30,8 +30,16 @@
                     <div class="dropdown">
                         <button type="button"
                             class="btn btn-sm @if ($pm_method->payment_method == 3) btn-primary @else bg-white @endif btn-icon-text border"
-                            style="font-size: 10px;" data-cart-report-id="{{ $active_cart_id }}" data-id="3"><i
+                            style="font-size: 9px;" data-cart-report-id="{{ $active_cart_id }}" data-id="3"><i
                                 class="typcn typcn-account-balance mr-2"></i>{{ __('BANK TRANSFER') }}</button>
+                    </div>
+                </div>
+                <div class="mb-3 mb-xl-0 pr-1">
+                    <div class="dropdown">
+                        <button type="button"
+                            class="btn btn-sm @if ($pm_method->payment_method == 4) btn-primary @else bg-white @endif btn-icon-text border"
+                            style="font-size: 9px;" data-cart-report-id="{{ $active_cart_id }}" data-id="4"><i
+                                class="typcn typcn-account-balance mr-2"></i>{{ __('CREDIT SALES') }}</button>
                     </div>
                 </div>
                 <input type="hidden" id="checkoutMethod" value="{{ $pm_method->payment_method }}">

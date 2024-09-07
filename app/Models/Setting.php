@@ -18,5 +18,7 @@ class Setting extends Model
         'company_signature',
         'logo_status',
         'signature_status',
+        'discount_visibility',
+        'discount_mode',
     ];
 }

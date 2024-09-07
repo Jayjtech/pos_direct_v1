@@ -17,6 +17,7 @@ class CreateCartReportsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('invoice_code')->nullable();
             $table->text('buyer')->nullable();
             $table->string('phone')->nullable();
             $table->longText('address')->nullable();

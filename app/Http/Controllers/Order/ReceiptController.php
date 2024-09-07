@@ -21,7 +21,6 @@ class ReceiptController extends Controller
     public function viewReceipt($id){  
         try{
             $combined_order = CombinedOrder::findOrFail($id);
-        
             $order = Order::where('combined_order_id', $id)->where('status','!=', 2)->get(); 
             $buyer_details = json_decode($combined_order->buyer_details); //Using order column on combined_order_tbl
             if($order->count() > 0){

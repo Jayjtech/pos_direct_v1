@@ -34,7 +34,8 @@
                             <th width="25%" style="font-size:14px;">Product</th>
                             <th width="20%" style="font-size:14px;">Price</th>
                             <th width="25%" style="font-size:14px;">Qty</th>
-                            <th width="20%" style="font-size:14px;">Dis(%)</th>
+                            <th width="20%" style="font-size:14px;">Dis
+                                {{ companyInfo()->discount_mode == 1 ? '(%)' : 'Amt' }}</th>
                             <th width="10%" style="font-size:14px;">Total</th>
                         </tr>
                     </thead>
@@ -43,8 +44,6 @@
                     @include('shop.partials.cart_display')
                 </div>
             </div>
-
-
         </div>
     </div>
 </div>

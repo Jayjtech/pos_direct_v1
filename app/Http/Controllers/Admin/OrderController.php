@@ -122,14 +122,16 @@ class OrderController extends Controller
                 if($user->can('order-report')){
                 $combined_orders = CombinedOrder::where('status','!=',2)
                                                     ->whereDate('created_at', $startDate)
-                                                    ->paginate(10);
+                                                    ->paginate(10)
+                                                    ->appends(['startDate' => $startDate, 'endDate' => $endDate]);
                     $grand_total = CombinedOrder::where('status','!=',2)
                                                     ->whereDate('created_at', $startDate)
                                                     ->sum('grand_total');
                 }else{
                 $combined_orders = CombinedOrder::where('user_id', $user->id)->where('status','!=',2)
                                                     ->whereDate('created_at', $startDate)
-                                                    ->paginate(10);
+                                                    ->paginate(10)
+                                                    ->appends(['startDate' => $startDate, 'endDate' => $endDate]);
                     $grand_total = CombinedOrder::where('user_id', $user->id)->where('status','!=',2)
                                                     ->whereDate('created_at', $startDate)
                                                     ->sum('grand_total');
@@ -139,14 +141,16 @@ class OrderController extends Controller
                 if($user->can('order-report')){
                 $combined_orders = CombinedOrder::where('status','!=',2)
                                                     ->whereBetween('created_at', [$startDate, $endDate])
-                                                    ->paginate(10);
+                                                    ->paginate(10)
+                                                    ->appends(['startDate' => $startDate, 'endDate' => $endDate]);
                 $grand_total = CombinedOrder::where('status','!=',2)
                                                     ->whereBetween('created_at', [$startDate, $endDate])
                                                     ->sum('grand_total');
                 }else{
                     $combined_orders = CombinedOrder::where('user_id', $user->id)->where('status','!=',2)
                                                     ->whereBetween('created_at', [$startDate, $endDate])
-                                                    ->paginate(10);
+                                                    ->paginate(10)
+                                                    ->appends(['startDate' => $startDate, 'endDate' => $endDate]);
 
                     $grand_total = CombinedOrder::where('user_id', $user->id)->where('status','!=',2)
                                                     ->whereBetween('created_at', [$startDate, $endDate])
@@ -183,7 +187,7 @@ class OrderController extends Controller
             $user = auth()->user();
             $ex = explode(" ", $user->name);
 
-            $products = Product::paginate(10);
+            $products = Product::all();
             $grand_total = Order::whereDate('created_at', $startDate)->sum('sub_total');
 
             $data = [

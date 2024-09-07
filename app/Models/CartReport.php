@@ -10,7 +10,7 @@ class CartReport extends Model
     use HasFactory;
 
     protected $fillable = [
-        "user_id","grand_total",
+        "user_id","grand_total","invoice_code"
     ];
 
     public function cart(){

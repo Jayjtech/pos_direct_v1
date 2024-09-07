@@ -30,50 +30,71 @@
         th,
         td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 5px;
             text-align: left;
+            font-size: 9px;
         }
 
         th {
             background-color: #f2f2f2;
+        }
+
+        .table th {
+            font-weight: bold;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
+            /* Add subtle striping */
+        }
+
+        .table tbody tr {
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
 
 <body>
 
-    @if (companyInfo()->company_logo)
+    {{-- @if (companyInfo()->company_logo)
         @if (companyInfo()->logo_status == 1)
-            {{-- Active --}}
             <img src="{{ asset('ui/' . companyInfo()->company_logo) }}" alt="Company Logo" id="logo" width="200"
                 height="100">
         @endif
-    @endif
-
+    @endif --}}
+    <h4 style="font-weight:bold;">{{ companyInfo()->company_name }}</h4>
     @php
         $phones = json_decode(companyInfo()->company_phones);
     @endphp
-    <div class="row">
-        <div class="col-6" style="text-align: left;">
-            <h6>
-                @if (companyInfo()->company_name)
-                    <span>{{ companyInfo()->company_name }}</span><br>
-                    <span>Email: {{ companyInfo()->company_email }}</span><br>
+    <div class="row" style="margin-top:-10px">
+        <div class="col-12" style="text-align: center; font-weight:bold;">
+            <h6 style="font-size:12px;font-weight:bold;">
+                @if (companyInfo()->company_email)
+                    {{-- <span>{{ companyInfo()->company_name }}</span><br> --}}
+                    <span>{{ companyInfo()->company_email }}</span><br>
                 @endif
                 @if (companyInfo()->company_address)
-                    <span>Address: {{ companyInfo()->company_address }}</span><br>
+                    <span>{{ companyInfo()->company_address }}</span><br>
                 @endif
 
                 @if (companyInfo()->company_phones)
                     @foreach ($phones as $phone)
-                        <span>Telephone: {{ $phone }}</span><br>
+                        <span>{{ $phone }}</span><br>
                     @endforeach
                 @endif
             </h6>
         </div>
 
-        <div class="col-6 d-flex justify-content-md-end" style="text-align: left;">
-            <h6>
+        <div class="col-12 d-flex justify-content-md-end"
+            style="text-align: left;font-size:12px;margin-top:-10px;font-weight:bold;">
+            <p>
+                @if ($combined_order->user)
+                    <span>Seller: {{ $combined_order->user->name }}</span><br>
+                    <span>Date: {{ $combined_order->created_at }}</span><br>
+                    <span>Trx-ID: {{ strtoupper($combined_order->trx_id) }}</span><br>
+                @endif
+
                 @if ($buyer_details->buyer)
                     <span>Buyer: {{ $buyer_details->buyer }}</span><br>
                 @endif
@@ -83,29 +104,29 @@
                 @if ($buyer_details->address)
                     <span>Address: {{ $buyer_details->address }}</span><br>
                 @endif
-            </h6>
+            </p>
         </div>
     </div>
     @yield('content')
     @if (companyInfo()->company_signature)
         @if (companyInfo()->signature_status == 1)
-            <div class="row">
+            <div class="row" style="margin-top:-20px;">
                 <div class="col-6" align="left">
                     {{-- Active --}}
                     <img src="{{ asset('ui/' . companyInfo()->company_signature) }}" alt="Company signature"
                         id="signature" width="150" height="50"><br>
-                    <span>{{ __("Seller's Signature") }}</span>
+                    <span style="font-size:12px; margin-top:-50px;">{{ __("Seller's Signature") }}</span>
                 </div>
                 <div class="col-6" align="right">
                     {{-- Active --}}
                     <br>
                     {{ __('___________________________') }}<br>
-                    <span>{{ __("Customer's Signature") }}</span>
+                    <span style="font-size:12px; margin-top:-50px;">{{ __("Customer's Signature") }}</span>
                 </div>
             </div>
         @endif
     @endif
-    <em>Thanks for your patronage! We look forward to seeing you again.</em>
+    <em style="font-size:10px; margin-top:-50px;">Thanks for your patronage!</em>
 
     <script src="{{ asset('ui/vendors/js/vendor.bundle.base.js') }}"></script>
 

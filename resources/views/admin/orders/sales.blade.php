@@ -33,20 +33,18 @@
                     </form>
                 </div>
             </div>
+
             {{-- Start of edit-user --}}
             <div class="card mt-3">
                 <div class="card-body">
                     <h1 class="font-weight-bold mb-2">SALES REPORTS</h1>
                     <div class="d-flex align-items-center justify-content-md-end get-pdf">
-
                         <a href="{{ route('admin.sales.pdf', ['startDate' => $startDate, 'endDate' => $endDate]) }}"
                             class="btn btn-sm btn-danger"><i class="mdi mdi-file-pdf"></i>PDF</a>
                     </div>
                     <div class="table table-responsive mb-3 display-sales">
-                        <p class="mb-2 font-weight-bold text-success">GRAND TOTAL:
-                            {!! config('basic.c_s') !!}{{ number_format($grand_total, 2) }}</p>
                         @include('admin.orders.partials.sales-table')
-                        {!! $products->links() !!}
+                        {{-- {!! $products->links() !!} --}}
                     </div>
                 </div>
             </div>
