@@ -11,6 +11,7 @@
                     <th>Qty sold </th>
                     <th>Discount given </th>
                     <th>Sub total </th>
+                    <th>NET SP. </th>
                 </tr>
             </thead>
             <tbody>
@@ -20,20 +21,22 @@
                     $total_dic = 0;
                     $total_oQ = 0;
                     $total_cQ = 0;
+                    $net_sp = 0;
                 @endphp
                 @forelse ($products as $product)
                     @php
-
                         /**Return sum of necessary columns*/
                         $data = getProductSales($startDate, $endDate, $product->id);
                     @endphp
                     @if ($data->sum->qty_total != null)
                         @php
                             $n++;
+                            $sub_net_sp = $data->sum->grand_total - $data->sum->disc_total;
                             $total_qty = $total_qty + $data->sum->qty_total;
                             $total_dic = $total_dic + $data->sum->disc_total;
                             $total_oQ = $total_oQ + $data->openingQty;
                             $total_cQ = $total_cQ + $data->closingQty;
+                            $net_sp = $net_sp + $sub_net_sp;
                         @endphp
                         <tr>
                             <td>{{ $n }}</td>
@@ -44,6 +47,7 @@
                             <td>{{ config('basic.currency') }}{{ number_format($data->sum->disc_total) }}</td>
                             <td>
                                 {{ config('basic.currency') }}{{ number_format($data->sum->grand_total, 2) }}</td>
+                            <td>{{ config('basic.currency') }}{{ number_format($sub_net_sp) }}</td>
                         </tr>
                     @endif
                 @empty
@@ -65,6 +69,7 @@
                     <th>{{ number_format($total_qty) }}</th>
                     <th>{{ config('basic.currency') }}{{ number_format($total_dic) }}</th>
                     <th>{{ config('basic.currency') }}{{ number_format($grand_total) }}</th>
+                    <th>{{ config('basic.currency') }}{{ number_format($net_sp) }}</th>
                 </tr>
             </tbody>
         </table>

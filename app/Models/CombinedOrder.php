@@ -11,6 +11,7 @@ class CombinedOrder extends Model
 
     protected $fillable = [
         'buyer_details',
+        'payment_method',
         'grand_total',
         'user_id',
         'trx_id',

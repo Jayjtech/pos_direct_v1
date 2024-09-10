@@ -232,7 +232,7 @@ class CartController extends Controller
             
             $cart_row = Cart::findOrFail($request->id);
 
-            $cart_row->discount = $request->discount; //Update the discount column
+            $cart_row->discount = ($cart_row->qty*$request->discount); //Update the discount column
             if(companyInfo()->discount_visibility == 1){
                 $discount = ($cart_row->qty*$request->discount);
             }else if(companyInfo()->discount_visibility == 0 && companyInfo()->discount_mode == 0){ // By Amount
@@ -282,21 +282,7 @@ class CartController extends Controller
             $user = auth()->user();
             CartReport::where('id', $request->cart_report_id)->update(["payment_method" => $request->checkout_method]);
             // Update cart report
-            switch($request->checkout_method){
-                case 1:
-                    $method = "Cash";
-                    break;
-                case 2:
-                    $method = "Credit Card";
-                    break;
-                case 3:
-                    $method = "Bank Transfer";
-                    break;
-                case 4:
-                    $method = "Credit Sales";
-                    break;
-            }
-
+            $method = paymentMethod($request->checkout_method);
              // Payment Method 
             $pm_method = CartReport::where('id', $request->cart_report_id)->first();
             $active_cart_id = $request->cart_report_id;

@@ -112,18 +112,7 @@ class ShopController extends Controller
         try{
             $user = auth()->user();
             $tab = CartReport::findOrFail($id);
-            
-            switch($tab->payment_method){
-                case 1:
-                    $payment_method = "Cash";
-                    break;
-                case 2:
-                    $payment_method = "Credit card";
-                    break;
-                case 3:
-                    $payment_method = "Bank transfer";
-                    break;
-            }
+            $payment_method = paymentMethod($tab->payment_method);
             
             // Move request from cart to orders table. Also save combined order in db
             $saveCombinedOrder = CombinedOrder::create([
@@ -133,6 +122,7 @@ class ShopController extends Controller
                     "address" => $tab->address,
                     "payment_method" => $payment_method,
                 ]),
+                "payment_method" => $tab->payment_method,
                 "trx_id" => $tab->invoice_code,
                 "user_id" => $user->id,
                 "grand_total" => $tab->grand_total,

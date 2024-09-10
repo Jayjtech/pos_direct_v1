@@ -15,6 +15,26 @@ if (!function_exists('dateFormatter')) {
         return $date ? Carbon::parse($date)->format('jS F Y h:ia') : '';
     }
 }
+if(!function_exists('paymentMethod')){
+    function paymentMethod($code){
+        switch($code){
+                case 1:
+                    $method = "Cash";
+                    break;
+                case 2:
+                    $method = "Credit Card";
+                    break;
+                case 3:
+                    $method = "Bank Transfer";
+                    break;
+                case 4:
+                    $method = "Credit Sales";
+                    break;
+            }
+
+        return $method;
+    }
+}
 
 if(!function_exists('orderStatus')){
     function orderStatus(int $value){

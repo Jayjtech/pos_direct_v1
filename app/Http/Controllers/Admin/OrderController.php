@@ -207,32 +207,56 @@ class OrderController extends Controller
 
 
     public function searchSales(Request $request){
-        try{
+        try {
+            // Step 1: Validate inputs (optional, but recommended)
+            $request->validate([
+                'startDate' => 'required|date',
+                'endDate' => 'required|date',
+            ]);
+
+            // Step 2: Get the input dates
             $startDate = $request->input('startDate');
             $endDate = $request->input('endDate');
-            if($startDate !== $endDate){
-                // Without adding 1day, it doesn't return the accurate list for the selected date
-                $endDate = Carbon::parse($request->input('endDate'))->addDays(1);
+
+            // Step 3: Calculate the grand_total based on date range
+            if ($startDate == $endDate) {
+                // If the start and end dates are the same, search for that specific day
                 $grand_total = Order::whereDate('created_at', $startDate)->sum('sub_total');
+            } else {
+                // Else search between the start and end dates
+                $grand_total = Order::whereBetween('created_at', [$startDate, $endDate])->sum('sub_total');
             }
-            $grand_total = Order::whereBetween('created_at', [$startDate, $endDate])->sum('sub_total');
+
+            // Step 4: Get authenticated user details and last name
             $user = auth()->user();
             $ex = explode(" ", $user->name);
+            $lastName = end($ex);
 
-           $products = Product::paginate(10);
+            // Step 5: Get products with pagination (optional: apply filters if needed)
+            $products = Product::all();
 
+            // Step 6: Prepare data for view
             $data = [
-                    'products' => $products,
-                    'startDate' => $startDate,
-                    'endDate' => $endDate,
-                    'grand_total' => $grand_total,
-                    'lastName' => end($ex)
-                ];
-                notify()->success('Showing search result from '. dateFormatter($startDate). ' to ' .dateFormatter($endDate));
-                return view('admin.orders.sales', $data);
-        }catch(Exception $e){
-                notify()->warning($e->getMessage());
-                return back();
+                'products' => $products,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'grand_total' => $grand_total,
+                'lastName' => $lastName
+            ];
+
+            // Step 7: Send a success notification with formatted dates
+            notify()->success('Showing search result from ' . dateFormatter($startDate) . ' to ' . dateFormatter($endDate));
+
+            // Step 8: Return the view with the prepared data
+            return view('admin.orders.sales', $data);
+
+        } catch (\Exception $e) {
+            // Log the error (optional)
+            // Log::error($e->getMessage());
+
+            // Show warning message and return back
+            notify()->warning($e->getMessage());
+            return back();
         }
     }
 }

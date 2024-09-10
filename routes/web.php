@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CashflowController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -51,6 +52,7 @@ Route::group(['prefix' => 'guest', 'as' => 'guest.'], function(){
     Route::get('/cart', [GuestCartController::class, 'index'])->name('cart');
     Route::get('/contact', [GuestHomeController::class, 'contactForm'])->name('contact.form');
 });
+
 // Admin privileges
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     // User
@@ -224,6 +226,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
     Route::get('/order-pdf/{startDate}/{endDate}', [PdfController::class, 'orderPdf'])->name('order.pdf');
     
+    
+    // Cashflow
+    Route::get('/cashflow', [CashflowController::class,'viewCashFlow'])->name('cashflow')->middleware('check_permission:general-report');
+    Route::get('/search-cashflow', [CashflowController::class, 'searchCashflow'])
+        ->name('search.cashflow')
+        ->middleware('check_permission:general-report');
+    Route::get('/cashflow-pdf/{startDate}/{endDate}', [PdfController::class, 'cashflowPdf'])->name('cashflow.pdf');
 
     // Settings
     Route::get('/company-info', [SettingsController::class, 'index'])
