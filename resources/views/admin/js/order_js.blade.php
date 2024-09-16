@@ -23,6 +23,7 @@
                 })
             })
 
+
             // Check input fields
             isChecked = false;
             $(document).on('click', '#checkAll', function() {
@@ -56,6 +57,29 @@
             document.getElementById('startDate').addEventListener('change', function() {
                 document.getElementById('endDate').min = this.value;
             });
+
+            // REVOKE
+            $(document).on("click", ".revoke-order a", function() {
+                var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
+                var order_id = $(this).attr("data-id");
+
+                $.ajax({
+                    url: "{{ route('admin.revoke.order.view') }}",
+                    type: "get",
+                    data: {
+                        name: name,
+                        order_id: order_id
+                    },
+                    success: function(response) {
+                        console.log(response)
+                        if (response.error) {
+                            console.log(response.error)
+                        } else {
+                            $('.revoke-modal').html(response.view)
+                        }
+                    }
+                })
+            })
 
         })
     </script>

@@ -18,6 +18,8 @@ class Order extends Model
         'barcode',
         'qty',
         'unit_price',
+        'sub_cost_price',
+        'sub_selling_price',
         'sub_total',
         'discount',
     ];

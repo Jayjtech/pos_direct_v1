@@ -208,13 +208,13 @@ if(!function_exists('getProductSales')){
             $sum = Order::where('product_id', $product_id)
                                     ->whereDate('created_at', $startDate)
                                     ->where('status', '!=', 2) // Refunded
-                                    ->selectRaw('sum(qty) as qty_total, sum(sub_total) as grand_total, sum(discount) as disc_total')
+                                    ->selectRaw('sum(qty) as qty_total, sum(sub_cost_price) as grand_cost_price, sum(sub_selling_price) as grand_selling_price, sum(sub_total) as grand_total, sum(discount) as disc_total')
                                     ->first();
         } else {
             $sum = Order::where('product_id', $product_id)
                                 ->whereBetween('created_at', [$startDate, $endDate])
                                 ->where('status', '!=', 2) // Refunded
-                                ->selectRaw('sum(qty) as qty_total, sum(sub_total) as grand_total, sum(discount) as disc_total')
+                                ->selectRaw('sum(qty) as qty_total, sum(sub_cost_price) as grand_cost_price, sum(sub_selling_price) as grand_selling_price, sum(sub_total) as grand_total, sum(discount) as disc_total')
                                 ->first();
         }
 

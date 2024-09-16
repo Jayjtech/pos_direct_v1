@@ -200,6 +200,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('/order-list', [OrderController::class, 'orderList'])
         ->name('order.list')
         ->middleware('check_permission:generate-receipt');
+
+    Route::get('/refunded-orders', [OrderController::class, 'refundedOrderList'])
+        ->name('refunded-order.list')
+        ->middleware('check_permission:generate-receipt');
+    
+    Route::get('/search-refunded-order', [OrderController::class, 'searchRefundedOrder'])
+        ->name('search.refunded.order')
+        ->middleware('check_permission:general-report');
+
     // Sales
     Route::get('/sales-report', [OrderController::class, 'salesReport'])
         ->name('sales.report')
@@ -219,7 +228,23 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::post('/refund-order', [OrderController::class, 'refundOrder'])
         ->name('refund.order')
         ->middleware('check_permission:order-report');
+        
     
+    // Revoke order view
+    Route::get('/revoke-order-view', [OrderController::class, 'revokeOrderView'])
+        ->name('revoke.order.view')
+        ->middleware('check_permission:generate-receipt');
+
+    // Revoke Order
+    Route::post('/revoke-order', [OrderController::class, 'revokeOrder'])
+        ->name('revoke.order')
+        ->middleware('check_permission:order-report');
+
+    // Revoke single order
+    Route::get('/revoke-single-order/{order_id}/{combined_order_id}', [OrderController::class, 'revokeSingleOrder'])
+        ->name('revoke.single.order')
+        ->middleware('check_permission:order-report');
+
     Route::get('/search-order', [OrderController::class, 'searchOrder'])
         ->name('search.order')
         ->middleware('check_permission:general-report');

@@ -180,12 +180,14 @@ class CartController extends Controller
                         'message' => '<strong>'.$cart_row->product->name . '</strong> quantity cannot be equal to <strong>0</strong>!'
                     ];
                 }else{
-                    if(companyInfo()->discount_mode == 0){ // By Amount
-                        $discount = ($cart_row->qty*$cart_row->discount);
-                    }else{ // By percentage
-                        $discount = ($cart_row->qty*$cart_row->product->price)*($cart_row->discount/100);
+                    //Update the discount column
+                    if($cart_row->checkbox_status == "checked"){
+                        $cart_row->discount = ($cart_row->qty*$cart_row->pdt_discount); 
+                    }else{
+                        $cart_row->discount = 0;
                     }
-                    $cart_row->sub_total = ($request->qty*$cart_row->product->price)-($discount);
+                    
+                    $cart_row->sub_total = ($cart_row->qty*$cart_row->product->price)-($cart_row->discount); //Deduct discount
                     $cart_row->save();
 
                     $response = [
@@ -195,7 +197,6 @@ class CartController extends Controller
                     ];
                 }
             }
-            
             
             // Update cart report
             $grand_total = Cart::where('cart_report_id', $cart_row->cart_report_id)->sum('sub_total');

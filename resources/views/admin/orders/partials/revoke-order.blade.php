@@ -1,9 +1,9 @@
-a<div class="modal-content">
-    <form action="{{ route('admin.refund.order') }}" enctype="multipart/form-data" method="post">
+<div class="modal-content">
+    <form action="{{ route('admin.revoke.order') }}" method="post">
         @csrf
         <div class="modal-header">
-            <h1 class="modal-title fs-5 font-weight-bold" id="editProductLabel">Refund order <span class="ml-5">Date:
-                    {{ dateFormatter($sub->created_at) }}</span></h1>
+            <h1 class="modal-title fs-5 font-weight-bold" id="editProductLabel">Revoke order <span class="ml-5">Date:
+                    {{ dateFormatter($sub->updated_at) }}</span></h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <input type="hidden" name="combined_order_id" value="{{ $sub->id }}">
@@ -42,7 +42,7 @@ a<div class="modal-content">
                                 @endphp
                                 <tr class="@if ($prod->status == 2) bg-info text-light @endif">
                                     <td>
-                                        @if ($prod->status != 2)
+                                        @if ($prod->status == 2)
                                             <input type="checkbox" name="orders[]" class="form-control p-4"
                                                 value="{{ $prod->id }}">
                                         @endif
@@ -57,9 +57,8 @@ a<div class="modal-content">
                                         {!! config('basic.c_s') !!}{{ number_format($prod->sub_total) }}
                                     </td>
                                     <td style="font-size: 11px;">
-                                        @if ($prod->status == 2)
-                                            <a href="{{ route('admin.revoke.single.order', ['order_id' => $prod->id, 'combined_order_id' => $sub->id]) }}"
-                                                class="btn-sm btn-primary">Revoke</a>
+                                        @if ($prod->status != 2)
+                                            <span>Refunded</span>
                                         @endif
                                     </td>
                                 </tr>

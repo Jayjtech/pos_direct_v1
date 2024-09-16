@@ -48,6 +48,7 @@ class ProductController extends Controller
             return back();
         }
         $product->name = $request->name;
+        $product->cost_price = $request->cost_price;
         $product->price = $request->price;
         $product->discount_amount = $request->discount_amount;
         $product->discount_percent = $request->discount_percent;
@@ -145,6 +146,7 @@ class ProductController extends Controller
 
         Product::create([
             'name' => $request->name,
+            'cost_price' => $request->cost_price,
             'price' => $request->price,
             'discount_mode' => $request->discount_mode,
             'discount_amount' => $request->discount_amount,

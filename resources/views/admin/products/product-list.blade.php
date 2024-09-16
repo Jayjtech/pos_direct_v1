@@ -37,10 +37,13 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th width="10%">Image</th>
-                                    <th width="30%">Product</th>
+                                    <th width="10%">Img</th>
+                                    <th width="30%">Pdt</th>
                                     <th width="20%">Category</th>
-                                    <th width="15%">Price</th>
+                                    <th width="15%">C. Price</th>
+                                    <th width="15%">S. Price</th>
+                                    <th width="15%">Disct</th>
+                                    <th width="15%">Profit</th>
                                     <th width="10%">In Store</th>
                                     <th width="30%">Barcode</th>
                                     <th width="10%">Status</th>
@@ -57,10 +60,22 @@
                                             @else
                                                 <img src="{{ asset('ui/images/default.png') }}" alt="{{ $product->name }}">
                                             @endif
+
+                                            @php
+                                                if ($product->discount_mode == 0) {
+                                                    $discount = $product->discount_amount;
+                                                } else {
+                                                    $discout = $product->price * ($product->discount_percent / 100);
+                                                }
+                                            @endphp
                                         </td>
                                         <td>{{ $product->name }}</td>
                                         <td>{{ $product->category->title }}</td>
-                                        <td>{!! config('basic.c_s') !!}{{ number_format($product->price, 2) }}</td>
+                                        <td>{!! config('basic.c_s') !!}{{ number_format($product->cost_price) }}</td>
+                                        <td>{!! config('basic.c_s') !!}{{ number_format($product->price) }}</td>
+                                        <td>{!! config('basic.c_s') !!}{{ number_format($discount) }}</td>
+                                        <td>{!! config('basic.c_s') !!}{{ number_format($product->price - $discount - $product->cost_price) }}
+                                        </td>
                                         <td>{{ number_format($product->availability) }}</td>
                                         <td>
                                             @if ($product->product_code)

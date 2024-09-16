@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Order;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Models\CombinedOrder;
@@ -37,12 +38,36 @@ class DashboardController extends Controller
         $myOrdersThisMonth = CombinedOrder::where('status', 1)->where('user_id', $user->id)->whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum('grand_total');
         $myOrdersThisYear = CombinedOrder::where('status', 1)->where('user_id', $user->id)->whereBetween('created_at', [$startOfYear, $endOfYear])->sum('grand_total');
 
+
+        $sumToday = Order::whereDate('created_at', now()->toDateString())
+                                    ->where('status', 1) // Refunded
+                                    ->selectRaw('sum(sub_cost_price) as grand_cost_price, sum(sub_selling_price) as grand_selling_price, sum(sub_total) as grand_total')
+                                    ->first();
+
+        $sumWeek = Order::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                                ->where('status', 1) // Refunded
+                                ->selectRaw('sum(sub_cost_price) as grand_cost_price, sum(sub_selling_price) as grand_selling_price, sum(sub_total) as grand_total')
+                                ->first();
+
+        $sumMonth = Order::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                                ->where('status', 1) // Refunded
+                                ->selectRaw('sum(sub_cost_price) as grand_cost_price, sum(sub_selling_price) as grand_selling_price, sum(sub_total) as grand_total')
+                                ->first();
+
+        $sumYear = Order::whereBetween('created_at', [$startOfYear, $endOfYear])
+                                ->where('status', 1) // Refunded
+                                ->selectRaw('sum(sub_cost_price) as grand_cost_price, sum(sub_selling_price) as grand_selling_price, sum(sub_total) as grand_total')
+                                ->first();
         $data = [
             'lastName' => end($ex),
             'allOrdersToday' => $allOrdersToday,
+            'sumToday' => $sumToday,
             'allOrdersThisWeek' => $allOrdersThisWeek,
+            'sumWeek' => $sumWeek,
             'allOrdersThisMonth' => $allOrdersThisMonth,
+            'sumMonth' => $sumMonth,
             'allOrdersThisYear' => $allOrdersThisYear,
+            'sumYear' => $sumYear,
             'myOrdersToday' => $myOrdersToday,
             'myOrdersThisWeek' => $myOrdersThisWeek,
             'myOrdersThisMonth' => $myOrdersThisMonth,

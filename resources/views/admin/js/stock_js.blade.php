@@ -46,11 +46,13 @@
 
             // Delete user
             $(document).on('click', '.delete-stock a', function() {
+                var deleteStockRoute = "{{ route('admin.delete.stock', ':stock_id') }}";
                 var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
                 var stock_id = $(this).attr("data-id");
+                var route = deleteStockRoute.replace(':stock_id', stock_id);
 
                 $('.delete-modal-footer').html(
-                    `<a href="/admin/delete-stock/${stock_id}" class="btn btn-primary">Yes</a>
+                    `<a href="${route}" class="btn btn-primary">Yes</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
                 );
                 $('.delete-modal').html(

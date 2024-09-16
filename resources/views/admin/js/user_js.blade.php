@@ -20,11 +20,13 @@
 
             // Delete user
             $(document).on('click', '.delete-user a', function() {
+                var deleteUserRoute = "{{ route('admin.delete.user', ':user_id') }}";
                 var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
                 var user_id = $(this).attr("data-id");
+                var route = deleteUserRoute.replace(':user_id', user_id);
 
                 $('.delete-modal-footer').html(
-                    `<a href="/admin/delete-user/${user_id}" class="btn btn-primary">Yes</a>
+                    `<a href="${route}" class="btn btn-primary">Yes</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
                 );
                 $('.delete-modal').html(

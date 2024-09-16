@@ -18,10 +18,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title mb-3">Today's Sales</h4>
-                                <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                                <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                     {!! config('basic.c_s') !!}
-                                    {{ number_format($allOrdersToday, 2) }}
+                                    {{ number_format($allOrdersToday) }}
                                 </p>
+                                <small class="text-success font-weight-bold mt-3">Profit: {!! config('basic.c_s') !!}
+                                    {{ number_format($sumToday->grand_total - $sumToday->grand_cost_price) }}</small>
                             </div>
                         </div>
                     </div>
@@ -30,10 +32,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title mb-3">Week's Sales</h4>
-                                <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                                <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                     {!! config('basic.c_s') !!}
-                                    {{ number_format($allOrdersThisWeek, 2) }}
+                                    {{ number_format($allOrdersThisWeek) }}
                                 </p>
+                                <small class="text-success font-weight-bold mt-3">Profit: {!! config('basic.c_s') !!}
+                                    {{ number_format($sumWeek->grand_total - $sumWeek->grand_cost_price) }}</small>
                             </div>
                         </div>
                     </div>
@@ -42,10 +46,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title mb-3">Month's Sales</h4>
-                                <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                                <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                     {!! config('basic.c_s') !!}
-                                    {{ number_format($allOrdersThisMonth, 2) }}
+                                    {{ number_format($allOrdersThisMonth) }}
                                 </p>
+                                <small class="text-success font-weight-bold mt-3">Profit: {!! config('basic.c_s') !!}
+                                    {{ number_format($sumMonth->grand_total - $sumMonth->grand_cost_price) }}</small>
                             </div>
                         </div>
                     </div>
@@ -54,10 +60,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title mb-3">Year's Sales</h4>
-                                <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                                <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                     {!! config('basic.c_s') !!}
-                                    {{ number_format($allOrdersThisYear, 2) }}
+                                    {{ number_format($allOrdersThisYear) }}
                                 </p>
+                                <small class="text-success font-weight-bold mt-3">Profit: {!! config('basic.c_s') !!}
+                                    {{ number_format($sumYear->grand_total - $sumYear->grand_cost_price) }}</small>
                             </div>
                         </div>
                     </div>
@@ -71,9 +79,9 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-3">Today's Sales</h4>
-                            <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                            <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                 {!! config('basic.c_s') !!}
-                                {{ number_format($myOrdersToday, 2) }}
+                                {{ number_format($myOrdersToday) }}
                             </p>
                         </div>
                     </div>
@@ -83,9 +91,9 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-3">Week's Sales</h4>
-                            <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                            <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                 {!! config('basic.c_s') !!}
-                                {{ number_format($myOrdersThisWeek, 2) }}
+                                {{ number_format($myOrdersThisWeek) }}
                             </p>
                         </div>
                     </div>
@@ -95,9 +103,9 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-3">Month's Sales</h4>
-                            <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                            <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                 {!! config('basic.c_s') !!}
-                                {{ number_format($myOrdersThisMonth, 2) }}
+                                {{ number_format($myOrdersThisMonth) }}
                             </p>
                         </div>
                     </div>
@@ -107,9 +115,9 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-3">Year's Sales</h4>
-                            <p class="" style="font-size: 30px;"><i class="mdi mdi-wallet text-success"></i>
+                            <p class="" style="font-size: 15px;"><i class="mdi mdi-wallet text-success"></i>
                                 {!! config('basic.c_s') !!}
-                                {{ number_format($myOrdersThisYear, 2) }}
+                                {{ number_format($myOrdersThisYear) }}
                             </p>
                         </div>
                     </div>

@@ -139,6 +139,8 @@ class ShopController extends Controller
                 $single_order->barcode = $cart->product->product_barcode;
                 $single_order->qty = $cart->qty;
                 $single_order->unit_price = $cart->price;
+                $single_order->sub_cost_price = $cart->product->cost_price*$cart->qty;
+                $single_order->sub_selling_price = $cart->product->price*$cart->qty;
                 $single_order->sub_total = $cart->sub_total;
                 $single_order->discount = $cart->discount;
                 $single_order->status = 1; // Completed

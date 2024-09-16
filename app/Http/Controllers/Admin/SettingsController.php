@@ -35,8 +35,12 @@ class SettingsController extends Controller
         try{
             $info = Setting::findOrFail($request->row_id);
             if($request->file('logo') != null){
-                if(!empty($info->company_logo)){
-                    unlink(public_path('ui/'. $info->company_logo));
+
+              if (!empty($info->company_logo)) {
+                    $logoPath = public_path('ui/' . $info->company_logo);
+                    if (file_exists($logoPath)) {
+                        @unlink($logoPath);
+                    }
                 }
                 
                 $image = $request->file('logo');
@@ -52,7 +56,10 @@ class SettingsController extends Controller
 
             if($request->file('signature') != null){
                 if(!empty($info->company_signature)){
-                    unlink(public_path('ui/'. $info->company_signature));
+                    $signature = public_path('ui/'. $info->company_signature);
+                    if(file_exists($signature)){
+                        @unlink($signature);
+                    }
                 }
                 
                 $image = $request->file('signature');

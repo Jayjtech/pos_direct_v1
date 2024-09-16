@@ -89,6 +89,11 @@
                             <li class="nav-item"> <a class="nav-link" href="{{ route('admin.order.list') }}">Orders Report</a>
                             </li>
                         @endcan
+                        @can('generate-receipt')
+                            <li class="nav-item"> <a class="nav-link" href="{{ route('admin.refunded-order.list') }}">Refunded
+                                    Orders</a>
+                            </li>
+                        @endcan
                         @can('order-report')
                             <li class="nav-item"> <a class="nav-link" href="{{ route('admin.sales.report') }}">Sales Report</a>
                             </li>

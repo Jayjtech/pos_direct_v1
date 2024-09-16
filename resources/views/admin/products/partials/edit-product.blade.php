@@ -36,7 +36,17 @@
             </div>
 
             <div class="form-group">
-                <label for="">Price</label>
+                <label for="">Cost Price</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
+                    </div>
+                    <input type="number" class="form-control" name="cost_price" value="{{ $product->cost_price }}"
+                        required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="">Selling Price</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
@@ -53,7 +63,7 @@
                             <span class="input-group-text bg-primary text-white">%</span>
                         </div>
                         <input type="number" class="form-control" name="discount_percent"
-                            value="{{ $product->discount_percent }}" required />
+                            value="{{ $product->discount_percent ? $product->discount_percent : 0 }}" required />
                     </div>
                 </div>
                 <div class="col-lg-6 mb-5">
@@ -63,7 +73,7 @@
                             <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
                         </div>
                         <input type="number" class="form-control" name="discount_amount"
-                            value="{{ $product->discount_amount }}" required />
+                            value="{{ $product->discount_amount ? $product->discount_amount : 0 }}" required />
                     </div>
                 </div>
                 <div class="col-lg-12">

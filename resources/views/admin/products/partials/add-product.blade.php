@@ -28,12 +28,21 @@
             </div>
 
             <div class="form-group">
-                <label for="">Price</label>
+                <label for="">Cost Price</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
                     </div>
-                    <input type="number" class="form-control" name="price" placeholder="Price" required />
+                    <input type="number" class="form-control" name="cost_price" placeholder="Cost Price" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="">Selling Price</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
+                    </div>
+                    <input type="number" class="form-control" name="price" placeholder="Selling Price" required />
                 </div>
             </div>
             <div class="form-group row">
@@ -43,7 +52,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-primary text-white">%</span>
                         </div>
-                        <input type="number" class="form-control" name="discount_percent" required />
+                        <input type="number" class="form-control" value="0" name="discount_percent" required />
                     </div>
                 </div>
                 <div class="col-lg-6 mb-5">
@@ -52,7 +61,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-primary text-white">{!! config('basic.c_s') !!}</span>
                         </div>
-                        <input type="number" class="form-control" name="discount_amount" required />
+                        <input type="number" class="form-control" value="0" name="discount_amount" required />
                     </div>
                 </div>
                 <div class="col-lg-12">
