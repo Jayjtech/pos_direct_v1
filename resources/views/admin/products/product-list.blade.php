@@ -114,7 +114,52 @@
                         </table>
                     </div>
                     {!! $products->links() !!}
+                    @php
+                        $total_c_price = $total_s_price = $total_disct = $total_profit = $total_pdt = 0;
+                        foreach ($all_products as $item) {
+                            if ($item->discount_mode == 0) {
+                                $discount = $item->discount_amount;
+                            } else {
+                                $discout = $item->price * ($item->discount_percent / 100);
+                            }
+
+                            $total_disct = $total_disct + $discount * $item->availability;
+                            $total_c_price = $total_c_price + $item->cost_price * $item->availability;
+                            $total_s_price = $total_s_price + $item->price * $item->availability;
+                            $total_pdt = $total_pdt + $item->availability;
+                        }
+                    @endphp
+                    <div class="mt-5">
+                        <h1 class="font-weight-bold mb-2">SUMMARY</h1>
+                        <div class="table table-responsive mb-3">
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Total Pdt</th>
+                                    <th>Total C. Price</th>
+                                    <th>Total S. Price</th>
+                                    <th>Total Disct</th>
+                                    <th>Total Profit</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-weight-bold">{{ number_format($total_pdt) }}</td>
+                                        <td class="font-weight-bold">
+                                            {!! config('basic.c_s') !!}{{ number_format($total_c_price) }}</td>
+                                        <td class="font-weight-bold">
+                                            {!! config('basic.c_s') !!}{{ number_format($total_s_price) }}</td>
+                                        <td class="font-weight-bold">
+                                            {!! config('basic.c_s') !!}{{ number_format($total_disct) }}</td>
+                                        <td class="text-success font-weight-bold">
+                                            {!! config('basic.c_s') !!}{{ number_format($total_s_price - $total_c_price) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+
+
             </div>
 
 

@@ -6,19 +6,17 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\ValidationException;
 
 trait AuthenticatesUsers
 {
     use RedirectsUsers, ThrottlesLogins;
 
-    /**
-     * Show the application's login form.
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function showLoginForm()
     {
+        Artisan::call('cache:clear');
         // Company info
         createCompanyInfo();
         

@@ -23,6 +23,8 @@ class CreateSettingsTable extends Migration
             $table->string('company_signature')->nullable();
             $table->integer('logo_status')->default(0);
             $table->integer('signature_status')->default(0);
+            $table->integer('discount_mode')->default(0);
+            $table->integer('discount_visibility')->default(0);
             $table->timestamps();
         });
     }

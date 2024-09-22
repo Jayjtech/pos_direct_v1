@@ -27,6 +27,8 @@ class CreateOrdersTable extends Migration
             $table->integer('status')->default(0)->comment('0:pending, 1:completed, 2:refunded');
             $table->decimal('qty',11,1)->default(0);
             $table->decimal('unit_price',11,1)->default(0);
+            $table->decimal('sub_cost_price',11,1)->default(0);
+            $table->decimal('sub_selling_price',11,1)->default(0);
             $table->decimal('sub_total',11,1)->default(0);
             $table->decimal('discount',11,1)->default(0);
             $table->timestamps();

@@ -18,7 +18,11 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
-            $table->decimal('price',11,2)->default(0);
+            $table->decimal('cost_price',11)->default(0);
+            $table->decimal('discount_amount',11)->default(0);
+            $table->decimal('discount_percent',11)->default(0);
+            $table->integer('discount_mode')->default(0);
+            $table->decimal('price',11)->default(0);
             $table->string('product_code')->nullable();
             $table->text('barcode')->nullable();
             $table->decimal('availability',11,2)->default(0);

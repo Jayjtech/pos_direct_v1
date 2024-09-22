@@ -21,7 +21,7 @@ class CreateCartReportsTable extends Migration
             $table->text('buyer')->nullable();
             $table->string('phone')->nullable();
             $table->longText('address')->nullable();
-            $table->integer('payment_method')->default(0)->comment('0:Cash, 1:Credit card, 2:Bank transfer');
+            $table->integer('payment_method')->default(0)->comment('0:Cash, 1:Credit card, 2:Bank transfer, 3:Credit sales');
             $table->decimal('grand_total',11,1)->default(0);
             $table->timestamps();
         });

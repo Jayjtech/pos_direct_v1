@@ -21,6 +21,7 @@ class CreateCombinedOrdersTable extends Migration
             $table->decimal('grand_total',11,2)->default(0);
             $table->string('trx_id')->nullable();
             $table->integer('status')->default(0)->comment('0:pending, 1:completed, 2:refunded');
+            $table->string('payment_method')->nullable();
             $table->timestamps();
         });
     }

@@ -19,13 +19,16 @@ class ProductController extends Controller
     // Product list
     public function index(){
         $products = Product::paginate(10);
+        $all_products = Product::all();
         $user = auth()->user();
         $ex = explode(" ", $user->name);
+
         $data = [
-            
             'lastName' => end($ex),
             'products' => $products,
+            'all_products' => $all_products,
         ];
+
 
         return view('admin.products.product-list', $data);
     }

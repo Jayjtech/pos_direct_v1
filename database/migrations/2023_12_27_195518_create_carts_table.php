@@ -26,6 +26,8 @@ class CreateCartsTable extends Migration
             $table->decimal('price',11,1)->default(0);
             $table->decimal('sub_total',11,1)->default(0);
             $table->decimal('discount',11,1)->default(0);
+            $table->decimal('pdt_discount',11,1)->default(0);
+            $table->string('checkbox_status')->nullable();
             $table->integer('status')->default(0)->comment('0: active, 1: saved');
             $table->timestamps();
         });
