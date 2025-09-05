@@ -117,20 +117,31 @@ class StockController extends Controller
     public function deleteStock($id){
         try{
             $stock = Stock::findOrFail($id);
+            $currentUser = auth()->user();
+            
+            // Check if stock request is already approved
             if($stock->status == 1){
-                notify()->warning("Sorry, You can't delete already approved request!");
+                notify()->error("Cannot delete approved stock request for '{$stock->product}'. Approved requests cannot be deleted for audit purposes.");
                 return back();
             }
-
-            notify()->info($stock->products->name. " successfully removed!");
+            
+            // Check if current user owns this stock request (unless user has approve-stock permission)
+            if($stock->user_id != $currentUser->id && !$currentUser->can('approve-stock')) {
+                notify()->error("You can only delete your own stock requests!");
+                return back();
+            }
+            
+            $productName = $stock->product;
+            $requestedQty = $stock->qty_requested;
+            
             $stock->delete();
+            
+            notify()->success("Stock request for '{$productName}' ({$requestedQty} units) has been successfully deleted!");
             return back();
 
         }catch(Exception $e){
-           if($e->getMessage()){
-                notify()->error($e->getMessage());
-                return back();
-            } 
+            notify()->error('Error deleting stock request: ' . $e->getMessage());
+            return back();
         }
     }
 

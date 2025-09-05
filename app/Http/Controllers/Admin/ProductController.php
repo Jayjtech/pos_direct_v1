@@ -97,12 +97,45 @@ class ProductController extends Controller
     public function deleteProduct($id){
         try{
             $product = Product::findOrFail($id);
-            notify()->info($product->name. ' has been deleted!');
+            $productName = $product->name;
+            
+            // Check if product is referenced in orders
+            $orderCount = \App\Models\Order::where('product_id', $id)->count();
+            if($orderCount > 0) {
+                notify()->error("Cannot delete '{$productName}'. This product is referenced in {$orderCount} order(s). Consider setting status to 'Unavailable' instead.");
+                return back();
+            }
+            
+            // Check if product is referenced in cart
+            $cartCount = \App\Models\Cart::where('product_id', $id)->count();
+            if($cartCount > 0) {
+                notify()->error("Cannot delete '{$productName}'. This product is currently in {$cartCount} active cart(s). Please remove from carts first.");
+                return back();
+            }
+            
+            // Check if product has stock requests
+            $stockCount = \App\Models\Stock::where('product_id', $id)->count();
+            if($stockCount > 0) {
+                notify()->error("Cannot delete '{$productName}'. This product has {$stockCount} stock request(s). Consider setting status to 'Unavailable' instead.");
+                return back();
+            }
+            
+            // Check if product has availability > 0
+            if($product->availability > 0) {
+                notify()->warning("Warning: Deleting '{$productName}' with {$product->availability} items in stock. This will result in inventory loss.");
+            }
+            
+            // Delete product image if exists
+            if(!empty($product->img) && file_exists(public_path('uploads/'. $product->img))) {
+                unlink(public_path('uploads/'. $product->img));
+            }
+            
             $product->delete();
-
+            notify()->success("'{$productName}' has been successfully deleted!");
+            
             return back();
         }catch(Exception $e){
-            notify()->error($e->getMessage());
+            notify()->error('Error deleting product: ' . $e->getMessage());
             return back();
         }
     }

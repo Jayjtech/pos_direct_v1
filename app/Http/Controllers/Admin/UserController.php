@@ -68,24 +68,69 @@ class UserController extends Controller
 
     // Delete user
     public function deleteUser($id){
-        $user = User::findOrFail($id);
-        foreach($user->roles as $role){
-            $user->removeRole($role->name);
+        try {
+            $currentUser = auth()->user();
+            $userToDelete = User::findOrFail($id);
+            
+            // Prevent self-deletion
+            if($currentUser->id == $userToDelete->id) {
+                notify()->error("You cannot delete your own account!");
+                return back();
+            }
+            
+            // Check if user has any active orders
+            $orderCount = $userToDelete->order()->count();
+            if($orderCount > 0) {
+                notify()->error("Cannot delete '{$userToDelete->name}'. This user has {$orderCount} order(s) in the system. Consider deactivating the account instead.");
+                return back();
+            }
+            
+            // Check if user has any combined orders
+            $combinedOrderCount = $userToDelete->combinedOrder()->count();
+            if($combinedOrderCount > 0) {
+                notify()->error("Cannot delete '{$userToDelete->name}'. This user has {$combinedOrderCount} transaction(s) in the system. Consider deactivating the account instead.");
+                return back();
+            }
+            
+            // Check if user has any active cart items
+            $cartCount = \App\Models\Cart::where('user_id', $id)->count();
+            if($cartCount > 0) {
+                notify()->warning("Warning: User '{$userToDelete->name}' has {$cartCount} items in cart. These will be deleted.");
+                // Clear user's cart before deletion
+                \App\Models\Cart::where('user_id', $id)->delete();
+                \App\Models\CartReport::where('user_id', $id)->delete();
+            }
+            
+            // Check if user has any stock requests
+            $stockCount = \App\Models\Stock::where('user_id', $id)->count();
+            if($stockCount > 0) {
+                notify()->error("Cannot delete '{$userToDelete->name}'. This user has {$stockCount} stock request(s). Please handle these requests first.");
+                return back();
+            }
+            
+            $userName = $userToDelete->name;
+            
+            // Remove roles and permissions
+            foreach($userToDelete->roles as $role){
+                $userToDelete->removeRole($role->name);
+            }
+
+            $permissionsViaRoles = $userToDelete->getPermissionsViaRoles();
+            $directPermissions = $userToDelete->getDirectPermissions();
+            $allPermissions = array_merge($permissionsViaRoles->toArray(), $directPermissions->toArray());
+            $allPermissions = (object) array_unique($allPermissions);
+
+            foreach($allPermissions as $permission){
+                $userToDelete->revokePermissionTo($permission);
+            }
+            
+            $userToDelete->delete();
+            notify()->success("'{$userName}' account has been successfully deleted!");
+            
+            return back();
+        } catch(Exception $e) {
+            notify()->error('Error deleting user: ' . $e->getMessage());
+            return back();
         }
-
-        $permissionsViaRoles = $user->getPermissionsViaRoles();
-
-        $directPermissions = $user->getDirectPermissions();
-
-        $allPermissions = array_merge($permissionsViaRoles->toArray(), $directPermissions->toArray());
-
-        $allPermissions = (object) array_unique($allPermissions);
-
-        foreach($allPermissions as $permission){
-            $user->revokePermissionTo($permission);
-        }
-        notify()->info($user->name."'s account has been deleted!");
-        $user->delete();
-        return back();
     }
 }

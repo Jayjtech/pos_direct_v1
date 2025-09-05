@@ -25,13 +25,46 @@
                 var route = deleteProductRoute.replace(':product_id', product_id);
 
                 $('.delete-modal-footer').html(
-                    `<p>Still want to proceed?</p> <a href="${route}" class="btn btn-primary">Yes</a>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
+                    `<div class="d-flex justify-content-between w-100">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label" for="confirmDelete">
+                                I understand the consequences
+                            </label>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <a href="${route}" class="btn btn-danger" id="confirmDeleteBtn" style="pointer-events: none; opacity: 0.5;">Delete Product</a>
+                        </div>
+                    </div>`
                 );
                 $('.delete-modal').html(
-                    `<span>Are you sure you want to delete <strong>${name}</strong>?</span>
-                    <p class="font-weight-bold alert alert-danger">It is advisable not to delete any product; this is striclty recommended for accurate record-keeping! You can simply set the product's status to "Unavailable".</p>
-                    `);
+                    `<div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Warning: Permanent Deletion</h5>
+                        <p>You are about to permanently delete the product: <strong>${name}</strong></p>
+                    </div>
+                    <div class="alert alert-danger">
+                        <strong>This action cannot be undone!</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Product will be permanently removed from the system</li>
+                            <li>Any existing inventory will be lost</li>
+                            <li>Historical data may be affected</li>
+                            <li>Product images will be deleted</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Alternative:</strong> Consider setting the product status to "Unavailable" instead of deleting it. This preserves historical data while preventing new sales.
+                    </div>`
+                );
+                
+                // Enable/disable delete button based on checkbox
+                $('#confirmDelete').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#confirmDeleteBtn').css({'pointer-events': 'auto', 'opacity': '1'});
+                    } else {
+                        $('#confirmDeleteBtn').css({'pointer-events': 'none', 'opacity': '0.5'});
+                    }
+                });
             })
 
             // Add product
