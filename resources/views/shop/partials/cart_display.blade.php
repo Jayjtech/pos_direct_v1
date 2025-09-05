@@ -9,7 +9,13 @@
                             Delete</a>
                     </div>
                 </td>
-                <td width="20%" style="font-size:12px;">{!! config('basic.c_s') !!}{{ number_format($ac->price) }}</td>
+                <td width="20%" style="font-size:12px;">{!! config('basic.c_s') !!}{{ number_format($ac->price) }}
+                    <input type="number" style="font-size:11px; margin-top:2px;" id="{{ $ac->id }}"
+                        unit-price="{{ $ac->fallback_price ? $ac->fallback_price : $ac->price }}"
+                        class="form-control fallback-price" name="price"
+                        value="{{ $ac->fallback_price ? $ac->fallback_price : $ac->price }}">
+
+                </td>
                 <td width="25%" style="font-size:12px;">
                     <form method="post" class="qty-form">
                         <input type="number" style="font-size:11px;" name="qty" class="form-control"

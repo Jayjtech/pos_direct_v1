@@ -115,19 +115,23 @@ class ShopController extends Controller
             $payment_method = paymentMethod($tab->payment_method);
             
             // Move request from cart to orders table. Also save combined order in db
-            $saveCombinedOrder = CombinedOrder::create([
-                "buyer_details" => json_encode([
-                    "buyer" => $tab->buyer,
-                    "phone" => $tab->phone,
-                    "address" => $tab->address,
-                    "payment_method" => $payment_method,
-                ]),
-                "payment_method" => $tab->payment_method,
-                "trx_id" => $tab->invoice_code,
-                "user_id" => $user->id,
-                "grand_total" => $tab->grand_total,
-                "status" => 1 //Completed
-            ]);
+            $check = CombinedOrder::where('trx_id', $tab->invoice_code)
+            ->where('user_id', $user->id)->first();
+            if(!$check){
+                $saveCombinedOrder = CombinedOrder::create([
+                    "buyer_details" => json_encode([
+                        "buyer" => $tab->buyer,
+                        "phone" => $tab->phone,
+                        "address" => $tab->address,
+                        "payment_method" => $payment_method,
+                    ]),
+                    "payment_method" => $tab->payment_method,
+                    "trx_id" => $tab->invoice_code,
+                    "user_id" => $user->id,
+                    "grand_total" => $tab->grand_total,
+                    "status" => 1 //Completed
+                ]);
+            }
 
             foreach($tab->cart as $cart){
                 $single_order = new Order();
@@ -141,7 +145,7 @@ class ShopController extends Controller
                 $single_order->unit_price = $cart->price;
                 $single_order->sub_cost_price = $cart->product->cost_price*$cart->qty;
                 $single_order->sub_selling_price = $cart->product->price*$cart->qty;
-                $single_order->sub_total = $cart->sub_total;
+                $single_order->sub_total =  getSubTotal($cart->qty,$cart->product->price,$cart->discount);
                 $single_order->discount = $cart->discount;
                 $single_order->status = 1; // Completed
                 // Save each in the orders table
@@ -166,11 +170,6 @@ class ShopController extends Controller
                 return back();
             }
         }
-        
-
-
-
-        
     }
 
 }

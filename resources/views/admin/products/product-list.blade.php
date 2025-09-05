@@ -33,6 +33,15 @@
                                 Products</a>
                         </div>
                     </div>
+
+                    <form method="GET" action="{{ route('admin.product.list') }}" class="mb-3">
+                        <div class="input-group w-50">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search by product name or category" value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+
                     <div class="table table-responsive mb-3">
                         <table class="table table-hover">
                             <thead>
@@ -188,7 +197,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5 font-weight-bold" id="exampleModalLabel">Delete product</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body delete-modal"></div>
                         <div class="delete-modal-footer modal-footer"></div>

@@ -16,21 +16,31 @@ class ProductController extends Controller
         $this->middleware('auth');
     }
 
-    // Product list
-    public function index(){
-        $products = Product::paginate(10);
+    public function index(Request $request){
+        $query = Product::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                ->orWhereHas('category', function ($q2) use ($search) {
+                    $q2->where('title', 'LIKE', "%$search%");
+                });
+            });
+        }
+
+        $products = $query->paginate(10)->withQueryString(); // Preserve query in pagination links
         $all_products = Product::all();
+
         $user = auth()->user();
         $ex = explode(" ", $user->name);
 
-        $data = [
+        return view('admin.products.product-list', [
             'lastName' => end($ex),
             'products' => $products,
             'all_products' => $all_products,
-        ];
-
-
-        return view('admin.products.product-list', $data);
+        ]);
     }
 
     // Product edit view

@@ -41,7 +41,7 @@
                     <td class="font-weight-bold">{{ $product->name }}</td>
                     <td>{{ number_format($data->openingQty) }}</td>
                     <td>{{ number_format($data->closingQty) }}</td>
-                    <td class="text-info font-weight-bold">{{ number_format($data->sum->qty_total) }}</td>
+                    <td class="text-info font-weight-bold">{{ number_format($data->openingQty - $data->closingQty) }}</td>
                     <td class="font-weight-bold">
                         {!! config('basic.c_s') !!}{{ number_format($data->sum->grand_cost_price) }}
                     </td>
@@ -73,7 +73,7 @@
             <th colspan="2">Summary</th>
             <th>{{ number_format($total_oQ) }}</th>
             <th>{{ number_format($total_cQ) }}</th>
-            <th>{{ number_format($total_qty) }}</th>
+            <th>{{ number_format($total_oQ - $total_cQ) }}</th>
             <th>{!! config('basic.c_s') !!}{{ number_format($total_cost_price) }}</th>
             <th>{!! config('basic.c_s') !!}{{ number_format($total_selling_price) }}</th>
             <th class="text-danger">{!! config('basic.c_s') !!}{{ number_format($total_dic) }}</th>

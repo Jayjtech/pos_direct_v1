@@ -33,6 +33,8 @@
             /* Set a higher z-index than the overlay */
         }
     </style>
+    {{-- Monnify SDK --}}
+    <script type="text/javascript" src="https://sdk.monnify.com/plugin/monnify.js"></script>
 </head>
 
 
@@ -72,9 +74,52 @@
     <!-- End plugin js for this page -->
     <!-- Custom js for this page-->
     <script src="{{ asset('ui/js/dashboard.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <!-- End custom js for this page-->
     @stack('script')
+    <script>
+        const fetchPlan = async () => {
+            const endpoint = "{{ env('API_BASE_URL') }}/api/subscription/me";
+            const params = {
+                uuid: "{{ env('ACTIVATION_KEY') }}"
+            };
+
+            try {
+                // Construct query string from params
+                const queryString = new URLSearchParams(params).toString();
+                const url = `${endpoint}?${queryString}`;
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data?.subscription?.status !== "active") {
+                    // Get the current route from the URL
+                    const currentRoute = window.location.pathname;
+
+                    // Redirect ONLY if the user is NOT already on "admin.view-activation"
+                    if (!currentRoute.includes("admin/account-activation")) {
+                        window.location.href = "{{ route('admin.view-activation') }}";
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching plan:", error.message);
+            }
+        };
+
+        // Call the function
+        fetchPlan();
+    </script>
     @notifyJs
 </body>
 

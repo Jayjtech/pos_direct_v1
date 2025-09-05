@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivationController;
 use App\Http\Controllers\Admin\CashflowController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HomeController; 
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\Admin\PdfController;
 use App\Http\Controllers\Shop\CartController;
@@ -22,13 +23,9 @@ use App\Http\Controllers\Guest\GuestHomeController;
 use App\Http\Controllers\Guest\ShopController as GuestShopController;
 use App\Models\Setting;
 
-Route::get('/', function(){
-    return view('welcome');
-});
 
 Auth::routes();
-
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/', [GuestHomeController::class, 'home'])->name('home');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop')->middleware('check_permission:shop');
 Route::get('/search-product', [ShopController::class, 'searchProduct'])->name('search.product');
@@ -36,6 +33,7 @@ Route::get('/pagination/paginate-products', [ShopController::class, 'paginatePro
 Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('add.to.cart');
 Route::post('/remove-from-cart', [CartController::class, 'removeFromCart'])->name('remove.from.cart');
 Route::post('/change-qty', [CartController::class, 'changeQty'])->name('change.qty');
+Route::post('/change-price', [CartController::class, 'changePrice'])->name('change.price');
 Route::post('/change-discount', [CartController::class, 'changeDiscount'])->name('change.discount');
 Route::get('/add-checkout-method', [CartController::class, 'addCheckoutMethod'])->name('add.checkout.method');
 Route::get('/create-new-tab', [CartController::class, 'createNewTab'])->name('create.new.tab');
@@ -101,6 +99,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('/create-product', [ProductController::class, 'index'])
         ->name('product.list')
         ->middleware('check_permission:create-product');
+    // Route::get('/create-product', [ProductController::class, 'index'])->name('products.index');
+
 
     Route::get('/edit-product-view', [ProductController::class, 'productEditView'])
         ->name('product.edit.view')
@@ -280,6 +280,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::post('/import-products', [ExcelController::class, 'importProducts'])
         ->name('import.products')
         ->middleware('check_permission:create-product');
+    
+
+    // Activation
+    Route::get('/account-activation', [ActivationController::class,'viewActivation'])->name('view-activation')->middleware('check_permission:general-report');
 
     Route::get('/test-barcode', [BarcodeController::class, 'runBarcode']);
 });

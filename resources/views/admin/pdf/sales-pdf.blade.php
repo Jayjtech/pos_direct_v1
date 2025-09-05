@@ -44,7 +44,7 @@
                             <td>{{ $product->name }}</td>
                             <td>{{ number_format($data->openingQty) }}</td>
                             <td>{{ number_format($data->closingQty) }}</td>
-                            <td>{{ number_format($data->sum->qty_total) }}</td>
+                            <td>{{ number_format($data->openingQty - $data->closingQty) }}</td>
                             <td>{{ config('basic.currency') }}{{ number_format($data->sum->grand_cost_price) }}
                             </td>
                             <td>{{ config('basic.currency') }}{{ number_format($data->sum->grand_selling_price) }}</td>
@@ -69,7 +69,7 @@
                     <th colspan="2">Summary</th>
                     <th>{{ number_format($total_oQ) }}</th>
                     <th>{{ number_format($total_cQ) }}</th>
-                    <th>{{ number_format($total_qty) }}</th>
+                    <th>{{ number_format($total_oQ - $total_cQ) }}</th>
                     <th>{{ config('basic.currency') }}{{ number_format($total_cost_price) }}</th>
                     <th>{{ config('basic.currency') }}{{ number_format($total_selling_price) }}</th>
                     <th>{{ config('basic.currency') }}{{ number_format($total_dic) }}</th>

@@ -100,6 +100,40 @@
             })
 
 
+            // Change Price
+            $(document).on('change blur', '.fallback-price', function() {
+                var fallbackPrice = $(this).val();
+                var unitPrice = $(this).attr('unit-price');
+                var id = $(this).attr('id');
+
+
+                $.ajax({
+                    url: "{{ route('change.price') }}",
+                    type: "post",
+                    data: {
+                        id: id,
+                        unit_price: parseFloat(unitPrice),
+                        fallback_price: parseFloat(fallbackPrice)
+                    },
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken
+                    },
+                    success: function(response) {
+                        $("#grand-total").html(
+                            `<span>Grand Total: {!! config('basic.c_s') !!}${new Intl.NumberFormat().format(parseFloat(response.grand_total))}</span>`
+                        )
+                        $('.cart-display').html(response.html);
+                        $('.variety').html(
+                            `<i class="mdi mdi-cart"></i> Variety: ${response.variety}</span>`
+                        )
+                        $("#response").html(
+                            `<span class="alert alert-${response.json.icon}">${response.json.message}</span>`
+                        )
+                    }
+                })
+            })
+
+
             // Change Discount
             $(document).on('change blur', '.discount-form input', function() {
                 var id = $(this).attr('id');
@@ -336,6 +370,7 @@
                     `<span class="alert alert-danger"><strong>Please select checkout method!</strong></span>`
                 );
             } else {
+                $(this).hide() //To hide button
                 var receiptUrl = generateReceiptRoute.replace(':id', id);
                 window.location.href = receiptUrl;
             }

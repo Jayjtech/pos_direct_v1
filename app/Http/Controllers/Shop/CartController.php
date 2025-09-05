@@ -18,6 +18,76 @@ class CartController extends Controller
         
     }
 
+
+    public function changePrice(Request $request){
+        $active_cart = collect(); // empty collection in case of failure
+        $grand_total = 0;
+
+        try {
+            $user = auth()->user();
+            $cart_row = Cart::findOrFail($request->id);
+            
+            // $cart_row->price = $request->fallback_price; // Update the price
+            $qty = $request->fallback_price / $cart_row->product->price; // Get the quantity from the unit price
+            $cart_row->fallback_price = $request->fallback_price;
+            $cart_row->qty = $qty;
+
+
+            if ($qty > $cart_row->product->availability) {
+                $response = [
+                    'status' => 1,
+                    'icon' => 'warning',
+                    'message' => 'Only <strong>' . $cart_row->product->availability . ' unit</strong> of <strong>' . $cart_row->product->name . '</strong> is left in store!'
+                ];
+            } else {
+                if (floatval($qty) < 0.1) {
+                    $response = [
+                        'status' => 1,
+                        'icon' => 'warning',
+                        'message' => '<strong>' . $cart_row->product->name . '</strong> quantity cannot be equal to <strong>0</strong>!'
+                    ];
+                } else {
+                    if ($cart_row->checkbox_status == "checked") {
+                        $cart_row->discount = ($cart_row->qty * $cart_row->pdt_discount);
+                    } else {
+                        $cart_row->discount = 0;
+                    }
+
+                    $cart_row->sub_total = getSubTotal($cart_row->qty, $cart_row->price, $cart_row->discount);
+                    $cart_row->save();
+
+                    $response = [
+                        'status' => 1,
+                        'icon' => 'success',
+                        'message' => '<strong>' . $cart_row->product->name . '</strong> price successfully updated to <strong>' . $request->fallback_price . '</strong>!'
+                    ];
+                }
+            }
+
+            $grand_total = Cart::where('cart_report_id', $cart_row->cart_report_id)->sum('sub_total');
+            CartReport::where('id', $cart_row->cart_report_id)->update(["grand_total" => $grand_total]);
+
+            $active_cart = Cart::where('cart_report_id', $cart_row->cart_report_id)
+                                ->where('user_id', $user->id)->get();
+
+        } catch (Exception $e) {
+            $response = [
+                'status' => 1,
+                'icon' => 'danger',
+                'message' => $e->getMessage()
+            ];
+        }
+
+        $view = view('shop.partials.cart_display', compact('active_cart'))->render();
+        return response()->json([
+            'html' => $view,
+            'json' => $response,
+            'variety' => $active_cart->count(),
+            'grand_total' => $grand_total
+        ]);
+    }
+
+
     public function addToCart(Request $request){
         
         try{
@@ -51,6 +121,7 @@ class CartController extends Controller
                     "cart_report_id" => $cart_report_id,
                     "qty" => 1,
                     "price" => $product->price,
+                    "fallback_price" => $product->price,
                     "sub_total" => $product->price, //On creation, sub_total = price
                     "discount" => 0,
                     "checkbox_status" => "unchecked",
@@ -109,7 +180,6 @@ class CartController extends Controller
                     'grand_total' => $grand_total,
                     'active_tab' => $cart_report_id
                 ]);
-                
     }
 
     // Remove product from cart
@@ -187,7 +257,8 @@ class CartController extends Controller
                         $cart_row->discount = 0;
                     }
                     
-                    $cart_row->sub_total = ($cart_row->qty*$cart_row->product->price)-($cart_row->discount); //Deduct discount
+                    $cart_row->sub_total = getSubTotal($cart_row->qty,$cart_row->product->price,$cart_row->discount); //Deduct discount
+                    $cart_row->fallback_price = $cart_row->product->price * $cart_row->qty; //Update the fallback price
                     $cart_row->save();
 
                     $response = [
@@ -242,7 +313,7 @@ class CartController extends Controller
                 $discount = ($cart_row->qty*$cart_row->product->price)*($request->discount/100);
             }
             
-            $cart_row->sub_total = ($cart_row->qty*$cart_row->product->price)-($discount); //Deduct discount
+            $cart_row->sub_total = getSubTotal($cart_row->qty,$cart_row->product->price,$discount);
             $cart_row->checkbox_status = $checkbox_status;
             $cart_row->save();
 

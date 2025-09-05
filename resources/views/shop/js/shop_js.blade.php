@@ -36,5 +36,43 @@
                 })
             })
         })
+
+        const dailyActivity = async () => {
+            const uuid = "{{ env('ACTIVATION_KEY') }}";
+
+            if (!uuid) {
+                console.log("Error: Account not activated. UUID not found!");
+                window.location.href = "{{ route('admin.view-activation') }}";
+                return;
+            }
+
+            const endpoint = "{{ env('API_BASE_URL') }}/api/subscription/decrement";
+            const payload = {
+                uuid
+            };
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data);
+
+            } catch (err) {
+                console.error("Error:", err.message);
+            }
+        };
+
+        dailyActivity();
     </script>
 @endpush

@@ -264,3 +264,11 @@ if(!function_exists('companyInfo')){
         return $company_info;
     }
 }
+
+if(!function_exists('getSubTotal')){
+    function getSubTotal($qty, $price, $discount){
+        $subTotal = $qty*$price;
+        $subTotal = $subTotal-$discount;
+        return $subTotal;
+    }
+}

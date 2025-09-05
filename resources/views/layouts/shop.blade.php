@@ -60,7 +60,50 @@
     <script src="{{ asset('ui/js/template.js') }}"></script>
     <script src="{{ asset('ui/js/settings.js') }}"></script>
     <script src="{{ asset('ui/js/todolist.js') }}"></script>
+
     @stack('script')
+    <script>
+        const fetchPlan = async () => {
+            const endpoint = "{{ env('API_BASE_URL') }}/api/subscription/me";
+            const params = {
+                uuid: "{{ env('ACTIVATION_KEY') }}"
+            };
+
+            try {
+                // Construct query string from params
+                const queryString = new URLSearchParams(params).toString();
+                const url = `${endpoint}?${queryString}`;
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data?.subscription?.status !== "active") {
+                    // Get the current route from the URL
+                    const currentRoute = window.location.pathname;
+
+                    // Redirect ONLY if the user is NOT already on "admin.view-activation"
+                    if (!currentRoute.includes("admin/account-activation")) {
+                        window.location.href = "{{ route('admin.view-activation') }}";
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching plan:", error.message);
+            }
+        };
+
+        // Call the function
+        fetchPlan();
+    </script>
     @notifyJs
 </body>
 
