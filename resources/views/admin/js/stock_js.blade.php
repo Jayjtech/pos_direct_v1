@@ -44,7 +44,7 @@
                 $("#row_" + button_id).remove();
             })
 
-            // Delete user
+            // Delete stock request
             $(document).on('click', '.delete-stock a', function() {
                 var deleteStockRoute = "{{ route('admin.delete.stock', ':stock_id') }}";
                 var name = $(this).attr("href").replace(new RegExp('#', 'g'), '');
@@ -52,11 +52,46 @@
                 var route = deleteStockRoute.replace(':stock_id', stock_id);
 
                 $('.delete-modal-footer').html(
-                    `<a href="${route}" class="btn btn-primary">Yes</a>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
+                    `<div class="d-flex justify-content-between w-100">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmStockDelete">
+                            <label class="form-check-label" for="confirmStockDelete">
+                                I confirm this deletion
+                            </label>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <a href="${route}" class="btn btn-danger" id="confirmStockDeleteBtn" style="pointer-events: none; opacity: 0.5;">Delete Request</a>
+                        </div>
+                    </div>`
                 );
                 $('.delete-modal').html(
-                    `<span>Are you sure you want to delete <strong>${name}</strong> request?</span>`);
+                    `<div class="alert alert-warning">
+                        <h5><i class="fas fa-box"></i> Delete Stock Request</h5>
+                        <p>You are about to delete the stock request for: <strong>${name}</strong></p>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>What happens when you delete this request:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>The stock request will be permanently removed</li>
+                            <li>You can only delete pending requests (not approved ones)</li>
+                            <li>You can only delete your own requests unless you're an approver</li>
+                            <li>This action cannot be undone</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-secondary">
+                        <strong>Note:</strong> Approved stock requests cannot be deleted to maintain audit trails.
+                    </div>`
+                );
+                
+                // Enable/disable delete button based on checkbox
+                $('#confirmStockDelete').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#confirmStockDeleteBtn').css({'pointer-events': 'auto', 'opacity': '1'});
+                    } else {
+                        $('#confirmStockDeleteBtn').css({'pointer-events': 'none', 'opacity': '0.5'});
+                    }
+                });
             })
         })
     </script>

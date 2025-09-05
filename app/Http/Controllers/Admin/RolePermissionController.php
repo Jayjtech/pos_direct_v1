@@ -73,16 +73,43 @@ class RolePermissionController extends Controller
     }
 
 
-    // Delete user
+    // Delete role
     public function deleteRole($id){
-        $role = Role::findOrFail($id);
-
-        // Delete permissions that belongs to the role
-        DB::table('role_has_permissions')->where('role_id', $id)->delete();
-        
-        notify()->info($role->name." role has been deleted!");
-        $role->delete();
-        return back();
+        try {
+            $role = Role::findOrFail($id);
+            $roleName = $role->name;
+            
+            // Prevent deletion of critical system roles
+            $protectedRoles = ['admin', 'super-admin', 'administrator'];
+            if(in_array(strtolower($roleName), $protectedRoles)) {
+                notify()->error("Cannot delete protected system role '{$roleName}'. This role is required for system operation.");
+                return back();
+            }
+            
+            // Check if role is assigned to users
+            $userCount = DB::table('model_has_roles')
+                          ->where('role_id', $id)
+                          ->count();
+                          
+            if($userCount > 0) {
+                notify()->error("Cannot delete role '{$roleName}'. This role is currently assigned to {$userCount} user(s). Please reassign these users to different roles first.");
+                return back();
+            }
+            
+            // Delete permissions that belong to the role
+            DB::table('role_has_permissions')->where('role_id', $id)->delete();
+            
+            // Delete user role assignments (should be 0 at this point due to check above)
+            DB::table('model_has_roles')->where('role_id', $id)->delete();
+            
+            $role->delete();
+            notify()->success("Role '{$roleName}' has been successfully deleted!");
+            
+            return back();
+        } catch(Exception $e) {
+            notify()->error('Error deleting role: ' . $e->getMessage());
+            return back();
+        }
     }
 
     // Role add view

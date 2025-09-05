@@ -26,11 +26,46 @@
                 var route = deleteUserRoute.replace(':user_id', user_id);
 
                 $('.delete-modal-footer').html(
-                    `<a href="${route}" class="btn btn-primary">Yes</a>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>`
+                    `<div class="d-flex justify-content-between w-100">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmUserDelete" required>
+                            <label class="form-check-label" for="confirmUserDelete">
+                                I confirm this user deletion
+                            </label>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <a href="${route}" class="btn btn-danger" id="confirmUserDeleteBtn" style="pointer-events: none; opacity: 0.5;">Delete User</a>
+                        </div>
+                    </div>`
                 );
                 $('.delete-modal').html(
-                    `<span>Are you sure you want to delete <strong>${name}'s </strong> account?</span>`);
+                    `<div class="alert alert-warning">
+                        <h5><i class="fas fa-user-times"></i> Delete User Account</h5>
+                        <p>You are about to permanently delete the user account: <strong>${name}</strong></p>
+                    </div>
+                    <div class="alert alert-danger">
+                        <strong>This action is irreversible!</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>User will no longer be able to access the system</li>
+                            <li>All roles and permissions will be revoked</li>
+                            <li>Active cart items will be deleted</li>
+                            <li>User cannot be deleted if they have orders or transactions</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> If the user has existing orders, transactions, or stock requests, the deletion will be prevented to maintain data integrity.
+                    </div>`
+                );
+                
+                // Enable/disable delete button based on checkbox
+                $('#confirmUserDelete').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#confirmUserDeleteBtn').css({'pointer-events': 'auto', 'opacity': '1'});
+                    } else {
+                        $('#confirmUserDeleteBtn').css({'pointer-events': 'none', 'opacity': '0.5'});
+                    }
+                });
             })
         })
     </script>
