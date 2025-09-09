@@ -25,7 +25,10 @@ use App\Models\Setting;
 
 
 Auth::routes();
-Route::get('/', [GuestHomeController::class, 'login'])->name('login');
+// Route::get('/', [GuestHomeController::class, 'home'])->name('home');
+Route::get('/', function(){
+    return view('auth.login');
+});
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop')->middleware('check_permission:shop');
 Route::get('/search-product', [ShopController::class, 'searchProduct'])->name('search.product');
